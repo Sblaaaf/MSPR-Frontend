@@ -27,9 +27,9 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-semibold text-foreground">HealthAI</h1>
+          <h1 className="text-2xl font-semibold text-foreground">Jarmy</h1>
           <p className="text-muted-foreground text-sm">
-            {isLogin ? "Connectez-vous à votre compte" : "Créez votre compte"}
+            {isLogin ? "Connectez-vous à votre compte Jarmy" : "Créez votre compte Jarmy"}
           </p>
         </div>
 
