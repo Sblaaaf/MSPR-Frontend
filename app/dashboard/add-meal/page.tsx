@@ -10,15 +10,16 @@ function AddAnalyzedMealForm({
   analyzedItems: { food: string; grams: number; kcal: number }[];
   onClose: () => void;
 }) {
-  const [typeRepas, setTypeRepas] = useState("dejeuner");
-  const [dateRepas, setDateRepas] = useState("");
+  const [typeRepas, setTypeRepas] = useState("petit_dejeuner");
+  // Mettre la date du jour par défaut (format YYYY-MM-DD)
+  const today = new Date().toISOString().slice(0, 10);
+  const [dateRepas, setDateRepas] = useState(today);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  async function handleAdd(e: React.FormEvent) {
-    e.preventDefault();
+  async function handleAdd() {
     setError("");
     setSuccess("");
     if (!dateRepas) {
@@ -36,16 +37,11 @@ function AddAnalyzedMealForm({
             ? Math.round((item.kcal / item.grams) * 100)
             : 0,
       }));
-      // Correction explicite pour éviter toute confusion de valeur
-      let repasValue = typeRepas;
-      if (repasValue === "petit-dejeuner") {
-        repasValue = "petit_dejeuner";
-      }
       const res = await fetch(`http://localhost:8003/users/${userId}/meals`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type_repas: repasValue,
+          type_repas: typeRepas,
           date_repas: dateRepas,
           notes,
           items,
@@ -64,17 +60,18 @@ function AddAnalyzedMealForm({
     }
   }
 
+  // Pas de <form> ici — on est déjà dans un <form> parent
   return (
-    <form onSubmit={handleAdd} className="mt-6 space-y-3 bg-gray-50 p-4 rounded">
+    <div className="mt-6 space-y-3 bg-gray-50 p-4 rounded">
       <div className="flex gap-2">
         <select
           value={typeRepas}
           onChange={(e) => setTypeRepas(e.target.value)}
           className="flex-1 p-2 border rounded"
         >
+          <option value="petit_dejeuner">Petit-déjeuner</option>
           <option value="dejeuner">Déjeuner</option>
           <option value="diner">Dîner</option>
-          <option value="petit_dejeuner">Petit déjeuner</option>
           <option value="collation">Collation</option>
         </select>
         <input
@@ -82,7 +79,6 @@ function AddAnalyzedMealForm({
           value={dateRepas}
           onChange={(e) => setDateRepas(e.target.value)}
           className="flex-1 p-2 border rounded"
-          required
         />
       </div>
       <textarea
@@ -92,21 +88,16 @@ function AddAnalyzedMealForm({
         className="w-full p-2 border rounded"
       />
       <div className="flex gap-2">
-        <Button type="submit" className="flex-1" disabled={loading}>
+        <Button type="button" className="flex-1" disabled={loading} onClick={handleAdd}>
           {loading ? "Ajout..." : "Valider"}
         </Button>
-        <Button
-          type="button"
-          className="flex-1"
-          variant="secondary"
-          onClick={onClose}
-        >
+        <Button type="button" className="flex-1" variant="secondary" onClick={onClose}>
           Annuler
         </Button>
       </div>
       {error && <div className="text-red-500 text-center">{error}</div>}
       {success && <div className="text-green-600 text-center">{success}</div>}
-    </form>
+    </div>
   );
 }
 
@@ -123,8 +114,7 @@ function AddMealResult({
       <div className="font-semibold">{result.message || "Réponse reçue"}</div>
       {typeof result.total_kcal !== "undefined" && (
         <div className="text-lg">
-          Total kcal :{" "}
-          <span className="font-bold">{result.total_kcal}</span>
+          Total kcal : <span className="font-bold">{result.total_kcal}</span>
         </div>
       )}
       {Array.isArray(result.items) && result.items.length > 0 ? (
@@ -139,7 +129,7 @@ function AddMealResult({
         <div className="text-muted-foreground mt-2">Aucun aliment trouvé.</div>
       )}
       {!showForm && Array.isArray(result.items) && result.items.length > 0 && (
-        <Button className="mt-4" onClick={() => setShowForm(true)}>
+        <Button type="button" className="mt-4" onClick={() => setShowForm(true)}>
           Ajouter ce repas à mon journal
         </Button>
       )}

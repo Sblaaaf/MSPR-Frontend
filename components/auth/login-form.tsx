@@ -31,19 +31,14 @@ export function LoginForm() {
 
       const data = await response.json()
 
-      if (data.success) {
+      if (data.success && data.user_id) {
+        localStorage.setItem("user_id", String(data.user_id))
+        localStorage.setItem("user_email", data.email ?? email)
+        localStorage.setItem("user_name", data.user_name ?? data.email ?? email)
         setSuccess(data.message)
-        // Stocker les infos utilisateur si nécessaire
-        if (data.user_id && data.email && data.user_name) {
-          localStorage.setItem("user_id", data.user_id)
-          localStorage.setItem("user_email", data.email)
-          localStorage.setItem("user_name", data.user_name)
-        }
-        console.log("[v0] Login success:", data)
-        // Rediriger vers le dashboard après un court délai
         setTimeout(() => {
-          router.push("/dashboard");
-        }, 800);
+          router.push("/dashboard")
+        }, 800)
       } else {
         setError(data.detail || data.message || "Connexion refusée")
       }

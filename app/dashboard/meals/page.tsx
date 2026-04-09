@@ -16,15 +16,21 @@ export default function MealsPage() {
   const [selectedMeal, setSelectedMeal] = useState<any | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
+    setLoading(true);
     const userId = localStorage.getItem("user_id") || "1";
     fetch(`http://localhost:8003/users/${userId}/meals`)
       .then((res) => res.json())
-      .then((data) => setMeals(data))
+      .then((data) => {
+        // L'API peut renvoyer un tableau direct ou { meals: [...] }
+        const list = Array.isArray(data) ? data : (data.meals ?? data.items ?? []);
+        setMeals(list);
+      })
       .catch(() => setError("Erreur lors du chargement des repas"))
       .finally(() => setLoading(false));
-  }, [deleting]);
+  }, []);
 
   const handleShowDetails = (meal: any) => {
     setSelectedMeal(meal);
@@ -33,10 +39,17 @@ export default function MealsPage() {
 
   const handleDelete = async (mealId: number) => {
     setDeleting(true);
-    await fetch(`http://localhost:8003/meals/${mealId}`, { method: "DELETE" });
-    setShowPopup(false);
-    setDeleting(false);
-    setMeals(meals.filter((m) => m.id !== mealId));
+    try {
+      const res = await fetch(`http://localhost:8003/meals/${mealId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      setMeals((prev) => prev.filter((m) => m.id !== mealId));
+      setShowPopup(false);
+      setSelectedMeal(null);
+    } catch {
+      setDeleteError("Erreur lors de la suppression.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -120,6 +133,7 @@ export default function MealsPage() {
             >
               {deleting ? "Suppression..." : "Supprimer"}
             </Button>
+            {deleteError && <div className="text-red-500 text-center text-sm">{deleteError}</div>}
           </div>
         </div>
       )}

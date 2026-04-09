@@ -9,7 +9,9 @@ export default function ManualMealPage() {
   const [calories100g, setCalories100g] = useState("");
   const [items, setItems] = useState<any[]>([]);
   const [typeRepas, setTypeRepas] = useState("dejeuner");
-  const [dateRepas, setDateRepas] = useState("");
+  // Mettre la date du jour par défaut (format YYYY-MM-DD)
+  const today = new Date().toISOString().slice(0, 10);
+  const [dateRepas, setDateRepas] = useState(today);
   const [notes, setNotes] = useState("");
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
