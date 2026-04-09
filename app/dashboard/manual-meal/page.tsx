@@ -100,7 +100,7 @@ export default function ManualMealPage() {
           <select value={typeRepas} onChange={e => setTypeRepas(e.target.value)} className="flex-1 p-2 border rounded">
             <option value="dejeuner">Déjeuner</option>
             <option value="diner">Dîner</option>
-            <option value="petit-dejeuner">Petit-déjeuner</option>
+            <option value="petit_dejeuner">Petit-déjeuner</option>
             <option value="collation">Collation</option>
           </select>
           <input type="date" value={dateRepas} onChange={e => setDateRepas(e.target.value)} className="flex-1 p-2 border rounded" />

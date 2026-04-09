@@ -2,6 +2,13 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
+function calcTotalKcal(items: any[]): number {
+  if (!Array.isArray(items)) return 0;
+  return Math.round(
+    items.reduce((sum, item) => sum + (item.calories_100g * item.quantite_g) / 100, 0)
+  );
+}
+
 export default function MealsPage() {
   const [meals, setMeals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -13,8 +20,8 @@ export default function MealsPage() {
   useEffect(() => {
     const userId = localStorage.getItem("user_id") || "1";
     fetch(`http://localhost:8003/users/${userId}/meals`)
-      .then(res => res.json())
-      .then(data => setMeals(data))
+      .then((res) => res.json())
+      .then((data) => setMeals(data))
       .catch(() => setError("Erreur lors du chargement des repas"))
       .finally(() => setLoading(false));
   }, [deleting]);
@@ -29,7 +36,7 @@ export default function MealsPage() {
     await fetch(`http://localhost:8003/meals/${mealId}`, { method: "DELETE" });
     setShowPopup(false);
     setDeleting(false);
-    setMeals(meals.filter(m => m.id !== mealId));
+    setMeals(meals.filter((m) => m.id !== mealId));
   };
 
   return (
@@ -37,7 +44,12 @@ export default function MealsPage() {
       <div className="w-full max-w-2xl bg-white/80 p-8 rounded-xl shadow">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">Mes repas</h2>
-          <a href="/dashboard/manual-meal" className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-accent transition-colors">Ajouter</a>
+          <a
+            href="/dashboard/manual-meal"
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-accent transition-colors"
+          >
+            Ajouter
+          </a>
         </div>
         {loading ? (
           <div>Chargement...</div>
@@ -47,33 +59,65 @@ export default function MealsPage() {
           <div>Aucun repas trouvé.</div>
         ) : (
           <ul className="divide-y">
-            {meals.map(meal => (
-              <li key={meal.id} className="py-3 cursor-pointer hover:bg-accent/20 rounded transition" onClick={() => handleShowDetails(meal)}>
+            {meals.map((meal) => (
+              <li
+                key={meal.id}
+                className="py-3 cursor-pointer hover:bg-accent/20 rounded transition"
+                onClick={() => handleShowDetails(meal)}
+              >
                 <div className="flex justify-between items-center">
-                  <span>{meal.type_repas} - {meal.date_repas}</span>
-                  <span className="text-muted-foreground">{meal.total_calories} kcal</span>
+                  <span>
+                    {meal.type_repas} - {meal.date_repas}
+                  </span>
+                  <span className="text-muted-foreground">
+                    {calcTotalKcal(meal.items)} kcal
+                  </span>
                 </div>
               </li>
             ))}
           </ul>
         )}
-        <a href="/dashboard" className="block mt-6 text-center text-primary underline">Retour au menu</a>
+        <a
+          href="/dashboard"
+          className="block mt-6 text-center text-primary underline"
+        >
+          Retour au menu
+        </a>
       </div>
+
       {showPopup && selectedMeal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg w-full max-w-md relative">
-            <button onClick={() => setShowPopup(false)} className="absolute top-2 right-2 text-xl">×</button>
+            <button
+              onClick={() => setShowPopup(false)}
+              className="absolute top-2 right-2 text-xl"
+            >
+              ×
+            </button>
             <h3 className="text-xl font-bold mb-2">Détails du repas</h3>
             <div>Date : {selectedMeal.date_repas}</div>
             <div>Type : {selectedMeal.type_repas}</div>
-            <div>Total kcal : {selectedMeal.total_calories}</div>
+            <div>Total kcal : {calcTotalKcal(selectedMeal.items)}</div>
             <div className="mt-2 mb-2">Notes : {selectedMeal.notes || "-"}</div>
             <ul className="mb-4">
-              {selectedMeal.items.map((item: any, idx: number) => (
-                <li key={idx}>{item.aliment_nom} : {item.quantite_g}g, {item.calories_100g} kcal/100g</li>
-              ))}
+              {selectedMeal.items.map((item: any, idx: number) => {
+                const kcal = Math.round((item.calories_100g * item.quantite_g) / 100);
+                return (
+                  <li key={idx}>
+                    {item.aliment_nom} : {item.quantite_g}g →{" "}
+                    <span className="font-medium">{kcal} kcal</span>
+                    <span className="text-muted-foreground text-sm ml-1">
+                      ({item.calories_100g} kcal/100g)
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
-            <Button onClick={() => handleDelete(selectedMeal.id)} disabled={deleting} className="bg-destructive text-white w-full mb-2">
+            <Button
+              onClick={() => handleDelete(selectedMeal.id)}
+              disabled={deleting}
+              className="bg-destructive text-white w-full mb-2"
+            >
               {deleting ? "Suppression..." : "Supprimer"}
             </Button>
           </div>

@@ -17,7 +17,7 @@ function AddAnalyzedMealForm({
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
 
-  async function handleAdd(e: React.MouseEvent<HTMLButtonElement>) {
+  async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -36,11 +36,16 @@ function AddAnalyzedMealForm({
             ? Math.round((item.kcal / item.grams) * 100)
             : 0,
       }));
+      // Correction explicite pour éviter toute confusion de valeur
+      let repasValue = typeRepas;
+      if (repasValue === "petit-dejeuner") {
+        repasValue = "petit_dejeuner";
+      }
       const res = await fetch(`http://localhost:8003/users/${userId}/meals`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type_repas: typeRepas,
+          type_repas: repasValue,
           date_repas: dateRepas,
           notes,
           items,
@@ -60,7 +65,7 @@ function AddAnalyzedMealForm({
   }
 
   return (
-    <div className="mt-6 space-y-3 bg-gray-50 p-4 rounded">
+    <form onSubmit={handleAdd} className="mt-6 space-y-3 bg-gray-50 p-4 rounded">
       <div className="flex gap-2">
         <select
           value={typeRepas}
@@ -69,7 +74,7 @@ function AddAnalyzedMealForm({
         >
           <option value="dejeuner">Déjeuner</option>
           <option value="diner">Dîner</option>
-          <option value="petit-dejeuner">Petit-déjeuner</option>
+          <option value="petit_dejeuner">Petit déjeuner</option>
           <option value="collation">Collation</option>
         </select>
         <input
@@ -87,7 +92,7 @@ function AddAnalyzedMealForm({
         className="w-full p-2 border rounded"
       />
       <div className="flex gap-2">
-        <Button type="button" className="flex-1" disabled={loading} onClick={handleAdd}>
+        <Button type="submit" className="flex-1" disabled={loading}>
           {loading ? "Ajout..." : "Valider"}
         </Button>
         <Button
@@ -101,7 +106,7 @@ function AddAnalyzedMealForm({
       </div>
       {error && <div className="text-red-500 text-center">{error}</div>}
       {success && <div className="text-green-600 text-center">{success}</div>}
-    </div>
+    </form>
   );
 }
 
