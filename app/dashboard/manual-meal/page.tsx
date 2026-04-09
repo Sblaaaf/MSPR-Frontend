@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 export default function ManualMealPage() {
   const [aliments, setAliments] = useState<any[]>([]);
   const [selectedAliment, setSelectedAliment] = useState("");
+  const [alimentInput, setAlimentInput] = useState("");
   const [quantite, setQuantite] = useState("");
   const [calories100g, setCalories100g] = useState("");
   const [items, setItems] = useState<any[]>([]);
@@ -78,21 +79,64 @@ export default function ManualMealPage() {
     <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
       <form onSubmit={handleSubmit} className="space-y-6 w-full max-w-md bg-white/80 p-8 rounded-xl shadow">
         <h2 className="text-2xl font-bold mb-4 text-center">Ajouter un repas manuellement</h2>
-        <div className="flex gap-2">
-          <select value={selectedAliment} onChange={e => {
-            setSelectedAliment(e.target.value);
-            const alim = aliments.find(a => a.nom === e.target.value);
-            setCalories100g(alim ? alim.calories_100g : "");
-          }} className="flex-1 p-2 border rounded">
-            <option value="">Choisir un aliment</option>
-            {aliments.map((a, idx) => (
-              <option key={idx} value={a.nom}>{a.nom}</option>
-            ))}
-          </select>
-          <input type="number" min="1" placeholder="Quantité (g)" value={quantite} onChange={e => setQuantite(e.target.value)} className="w-28 p-2 border rounded" />
-          <input type="number" min="0" placeholder="Kcal/100g" value={calories100g} onChange={e => setCalories100g(e.target.value)} className="w-28 p-2 border rounded" />
+        <div className="flex gap-2 relative">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="Rechercher un aliment"
+              value={alimentInput}
+              onChange={e => {
+                setAlimentInput(e.target.value);
+              }}
+              className="w-full p-2 border rounded"
+              autoComplete="off"
+              onFocus={() => {
+                if (alimentInput === "") setAlimentInput("");
+              }}
+            />
+            {alimentInput && (
+              <ul className="absolute z-10 bg-white border rounded w-full max-h-40 overflow-y-auto shadow mt-1">
+                {aliments.filter(a => a.nom.toLowerCase().includes(alimentInput.toLowerCase())).slice(0, 20).map((a, idx) => (
+                  <li
+                    key={idx}
+                    className={`px-2 py-1 cursor-pointer hover:bg-gray-100 ${selectedAliment === a.nom ? 'bg-gray-200' : ''}`}
+                    onClick={() => {
+                      setSelectedAliment(a.nom);
+                      setCalories100g(a.calories_100g);
+                      setAlimentInput(a.nom);
+                    }}
+                  >
+                    {a.nom}
+                  </li>
+                ))}
+                {aliments.filter(a => a.nom.toLowerCase().includes(alimentInput.toLowerCase())).length === 0 && (
+                  <li className="px-2 py-1 text-gray-400">Aucun aliment trouvé</li>
+                )}
+              </ul>
+            )}
+          </div>
+          <input
+            type="number"
+            min="1"
+            placeholder="Quantité (g)"
+            value={quantite}
+            onChange={e => setQuantite(e.target.value)}
+            className="w-28 p-2 border rounded"
+          />
+          <input
+            type="number"
+            min="0"
+            placeholder="Kcal/100g"
+            value={calories100g}
+            onChange={e => setCalories100g(e.target.value)}
+            className="w-28 p-2 border rounded"
+          />
           <Button type="button" onClick={addItem}>Ajouter</Button>
         </div>
+        {/* Synchroniser la sélection */}
+        {selectedAliment && (
+          <input type="hidden" value={selectedAliment} />
+        )}
         <ul className="mb-2">
           {items.map((item, idx) => (
             <li key={idx}>{item.aliment_nom} : {item.quantite_g}g, {item.calories_100g} kcal/100g</li>
