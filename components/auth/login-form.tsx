@@ -1,11 +1,13 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 
 export function LoginForm() {
+  const router = useRouter();
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -32,11 +34,16 @@ export function LoginForm() {
       if (data.success) {
         setSuccess(data.message)
         // Stocker les infos utilisateur si nécessaire
-        if (data.user_id && data.email) {
+        if (data.user_id && data.email && data.user_name) {
           localStorage.setItem("user_id", data.user_id)
           localStorage.setItem("user_email", data.email)
+          localStorage.setItem("user_name", data.user_name)
         }
         console.log("[v0] Login success:", data)
+        // Rediriger vers le dashboard après un court délai
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 800);
       } else {
         setError(data.detail || data.message || "Connexion refusée")
       }
