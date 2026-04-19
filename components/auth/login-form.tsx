@@ -35,6 +35,7 @@ export function LoginForm() {
         localStorage.setItem("user_id", String(data.user_id))
         localStorage.setItem("user_email", data.email ?? email)
         localStorage.setItem("user_name", data.user_name ?? data.email ?? email)
+        localStorage.setItem("user_abonnement", data.abonnement ?? "freemium") // NOUVELLE LIGNE
         setSuccess(data.message)
         setTimeout(() => {
           router.push("/dashboard")

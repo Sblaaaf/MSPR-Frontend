@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Salad,
@@ -10,9 +10,11 @@ import {
   Plus,
   X,
   Utensils,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+// Composant interne pour le formulaire d'enregistrement final après analyse
 function AddAnalyzedMealForm({
   analyzedItems,
   onClose,
@@ -57,7 +59,7 @@ function AddAnalyzedMealForm({
         }),
       });
       if (!res.ok) throw new Error();
-      setSuccess("Repas ajoute !");
+      setSuccess("Repas ajouté !");
       setTimeout(() => {
         setSuccess("");
         onClose();
@@ -71,8 +73,8 @@ function AddAnalyzedMealForm({
 
   const mealTypes = [
     { value: "petit_dejeuner", label: "Petit-dej" },
-    { value: "dejeuner", label: "Dejeuner" },
-    { value: "diner", label: "Diner" },
+    { value: "dejeuner", label: "Déjeuner" },
+    { value: "diner", label: "Dîner" },
     { value: "collation", label: "Collation" },
   ];
 
@@ -83,7 +85,6 @@ function AddAnalyzedMealForm({
         Enregistrer ce repas
       </h3>
 
-      {/* Meal type pills */}
       <div className="flex flex-wrap gap-2">
         {mealTypes.map((type) => (
           <button
@@ -122,14 +123,7 @@ function AddAnalyzedMealForm({
           disabled={loading}
           onClick={handleAdd}
         >
-          {loading ? (
-            "Ajout..."
-          ) : (
-            <>
-              <Check className="w-4 h-4" />
-              Valider
-            </>
-          )}
+          {loading ? "Ajout..." : <><Check className="w-4 h-4" /> Valider</>}
         </Button>
         <Button
           type="button"
@@ -152,6 +146,7 @@ function AddAnalyzedMealForm({
   );
 }
 
+// Composant pour afficher les résultats de l'analyse IA
 function AddMealResult({
   result,
 }: {
@@ -165,14 +160,13 @@ function AddMealResult({
 
   return (
     <div className="mt-6 space-y-4 animate-slide-up">
-      {/* Result Card */}
       <div className="p-5 bg-card rounded-2xl border border-border space-y-4">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-primary" />
           </div>
           <p className="font-medium text-foreground">
-            {result.message || "Analyse terminee"}
+            {result.message || "Analyse terminée"}
           </p>
         </div>
 
@@ -188,10 +182,7 @@ function AddMealResult({
         {Array.isArray(result.items) && result.items.length > 0 ? (
           <ul className="space-y-2 pt-2 border-t border-border">
             {result.items.map((item, idx) => (
-              <li
-                key={idx}
-                className="flex items-center justify-between py-2"
-              >
+              <li key={idx} className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
                     <Utensils className="w-4 h-4 text-primary" />
@@ -208,7 +199,7 @@ function AddMealResult({
             ))}
           </ul>
         ) : (
-          <p className="text-muted-foreground text-sm">Aucun aliment trouve.</p>
+          <p className="text-muted-foreground text-sm">Aucun aliment trouvé.</p>
         )}
       </div>
 
@@ -233,6 +224,7 @@ function AddMealResult({
   );
 }
 
+// Page principale
 export default function AddMealPage() {
   const [text, setText] = useState("");
   const [result, setResult] = useState<null | {
@@ -242,6 +234,13 @@ export default function AddMealPage() {
   }>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isPremium, setIsPremium] = useState<boolean | null>(null);
+
+  // Vérification du statut d'abonnement au montage
+  useEffect(() => {
+    const abonnement = localStorage.getItem("user_abonnement");
+    setIsPremium(abonnement === "premium" || abonnement === "premium_plus");
+  }, []);
 
   async function handleAnalyze(e: React.FormEvent) {
     e.preventDefault();
@@ -249,8 +248,7 @@ export default function AddMealPage() {
     setError("");
     setResult(null);
     try {
-      const apiUrl =
-        process.env.NEXT_PUBLIC_JARMY_API_URL || "http://localhost:8000";
+      const apiUrl = process.env.NEXT_PUBLIC_JARMY_API_URL || "http://localhost:8000";
       const res = await fetch(`${apiUrl}/kcal/predict`, {
         method: "POST",
         headers: {
@@ -271,7 +269,6 @@ export default function AddMealPage() {
 
   return (
     <main className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
       <header className="flex items-center justify-between px-5 py-4 bg-card/80 backdrop-blur-sm sticky top-0 z-10 border-b border-border">
         <Link
           href="/dashboard"
@@ -288,63 +285,98 @@ export default function AddMealPage() {
         <div className="w-16" />
       </header>
 
-      {/* Content */}
       <section className="flex-1 flex flex-col px-5 py-6 animate-fade-in">
         <div className="max-w-md mx-auto w-full space-y-6">
-          {/* Title */}
-          <div className="text-center space-y-2">
-            <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-7 h-7 text-primary" />
-            </div>
-            <h1 className="text-xl font-bold tracking-tight text-foreground">
-              Analyse IA
-            </h1>
-            <p className="text-muted-foreground text-sm">
-              Decrivez votre repas pour obtenir une estimation calorique
-            </p>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleAnalyze} className="space-y-4">
-            <div className="relative">
-              <textarea
-                className="w-full h-36 p-4 bg-card border border-border rounded-2xl text-sm resize-none placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
-                placeholder="Ex: 200g de riz, 150g de poulet grille, salade verte avec vinaigrette..."
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                required
-              />
-              <div className="absolute bottom-3 right-3 text-xs text-muted-foreground">
-                {text.length}/500
+          
+          {isPremium === false ? (
+            /* PAYWALL UI pour les utilisateurs Freemium */
+            <div className="flex flex-col items-center justify-center p-8 bg-card border border-border rounded-3xl text-center space-y-6 mt-10 animate-scale-in">
+              <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Lock className="w-8 h-8 text-primary" />
               </div>
+              <div className="space-y-2">
+                <h2 className="text-xl font-bold">Fonctionnalité Premium</h2>
+                <p className="text-muted-foreground text-sm">
+                  Débloquez l'analyse des repas par Intelligence Artificielle pour un suivi instantané.
+                </p>
+              </div>
+              <ul className="text-sm text-left space-y-3 w-full border-t border-b border-border py-4">
+                <li className="flex gap-2 items-center"><Check className="w-4 h-4 text-primary"/> Détection automatique des aliments</li>
+                <li className="flex gap-2 items-center"><Check className="w-4 h-4 text-primary"/> Calcul des calories instantané</li>
+                <li className="flex gap-2 items-center"><Check className="w-4 h-4 text-primary"/> Recommandations de l'IA</li>
+              </ul>
+              <Button className="w-full h-14 rounded-2xl text-base font-semibold shadow-lg shadow-primary/20">
+                Passer au Premium - 9,99€/mois
+              </Button>
+              <Link href="/dashboard/manual-meal">
+                <Button variant="ghost" className="w-full text-muted-foreground">
+                  Saisie manuelle (Gratuit)
+                </Button>
+              </Link>
             </div>
+          ) : isPremium === true ? (
+            /* UI ANALYSE pour les utilisateurs Premium */
+            <>
+              <div className="text-center space-y-2">
+                <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center mx-auto mb-4">
+                  <Sparkles className="w-7 h-7 text-primary" />
+                </div>
+                <h1 className="text-xl font-bold tracking-tight text-foreground">
+                  Analyse IA
+                </h1>
+                <p className="text-muted-foreground text-sm">
+                  Décrivez votre repas pour obtenir une estimation calorique
+                </p>
+              </div>
 
-            <Button
-              type="submit"
-              className="w-full h-14 rounded-2xl gap-2 text-base font-semibold"
-              disabled={loading || !text.trim()}
-            >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  Analyse en cours...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  Analyser
-                </>
+              <form onSubmit={handleAnalyze} className="space-y-4">
+                <div className="relative">
+                  <textarea
+                    className="w-full h-36 p-4 bg-card border border-border rounded-2xl text-sm resize-none placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
+                    placeholder="Ex: 200g de riz, 150g de poulet grillé, salade verte..."
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    required
+                  />
+                  <div className="absolute bottom-3 right-3 text-xs text-muted-foreground">
+                    {text.length}/500
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full h-14 rounded-2xl gap-2 text-base font-semibold"
+                  disabled={loading || !text.trim()}
+                >
+                  {loading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-5 h-5" />
+                      Analyser
+                    </>
+                  )}
+                </Button>
+              </form>
+
+              {error && (
+                <div className="p-4 bg-destructive/10 rounded-xl">
+                  <p className="text-destructive text-sm text-center">{error}</p>
+                </div>
               )}
-            </Button>
-          </form>
 
-          {error && (
-            <div className="p-4 bg-destructive/10 rounded-xl">
-              <p className="text-destructive text-sm text-center">{error}</p>
+              {result && <AddMealResult result={result} />}
+            </>
+          ) : (
+            /* État de chargement initial */
+            <div className="flex flex-col items-center justify-center p-20 space-y-4">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+              <p className="text-sm text-muted-foreground">Vérification de l'abonnement...</p>
             </div>
           )}
-
-          {result && <AddMealResult result={result} />}
         </div>
       </section>
     </main>
