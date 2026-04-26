@@ -5,22 +5,70 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Salad,
-  Camera,
-  PenLine,
-  History,
-  LogOut,
-  ChevronRight,
+  Sparkles,
+  Plus,
   Flame,
+  History,
+  ChevronRight,
+  Zap,
+  Watch,
   TrendingUp,
   Target,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+interface MealLineResponse {
+  calories_calculees: number;
+}
+
+interface MealResponse {
+  id: number;
+  date_repas: string;
+  type_repas: string;
+  notes?: string;
+  total_calories: number;
+  items: MealLineResponse[];
+}
+
+interface Objective {
+  id: number;
+  libelle: string;
+  actif: boolean;
+}
+
+function calcStreak(meals: MealResponse[]): number {
+  if (!meals.length) return 0;
+  const dates = new Set(meals.map((m) => m.date_repas).filter(Boolean));
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toISOString().slice(0, 10);
+    if (dates.has(dateStr)) {
+      streak++;
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+const REPAS_LABELS: Record<string, string> = {
+  petit_dejeuner: "Petit-déjeuner",
+  dejeuner: "Déjeuner",
+  diner: "Dîner",
+  collation: "Collation",
+};
 
 export default function Dashboard() {
-  const [userName, setUserName] = useState("");
-  const [mounted, setMounted] = useState(false);
-  const [meals, setMeals] = useState([]);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const [userName, setUserName] = useState("Ami de Jarmy");
+  const [abonnement, setAbonnement] = useState("freemium");
+  const [meals, setMeals] = useState<MealResponse[]>([]);
+  const [objectives, setObjectives] = useState<Objective[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -29,245 +77,228 @@ export default function Dashboard() {
       router.replace("/login");
       return;
     }
-    const name = localStorage.getItem("user_name") || "Utilisateur";
-    setUserName(name.split(" ")[0]);
+    setUserName(localStorage.getItem("user_name") || "Ami de Jarmy");
+    setAbonnement(localStorage.getItem("user_abonnement") || "freemium");
 
-    // Fetch meals for stats
-    setLoading(true);
-    fetch(`http://localhost:8003/users/${userId}/meals`)
-      .then((res) => res.json())
-      .then((data) => {
-        const list = Array.isArray(data) ? data : (data.meals ?? data.items ?? []);
-        setMeals(list);
+    Promise.all([
+      fetch(`http://localhost:8003/users/${userId}/meals`).then((r) => r.json()),
+      fetch(`http://localhost:8003/users/${userId}/objectives`).then((r) => r.json()),
+    ])
+      .then(([mealsData, objData]) => {
+        setMeals(Array.isArray(mealsData) ? mealsData : []);
+        setObjectives(Array.isArray(objData) ? objData : []);
       })
-      .catch(() => setMeals([]))
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, [router]);
 
   if (!mounted) return null;
 
-  function handleLogout() {
-    localStorage.removeItem("user_id");
-    localStorage.removeItem("user_name");
-    router.replace("/login");
-  }
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const todayMeals = meals.filter((m) => m.date_repas === todayStr);
+  const caloriesTarget = 2100;
+  const caloriesConsumed = loading
+    ? 0
+    : Math.round(todayMeals.reduce((sum, m) => sum + (m.total_calories || 0), 0));
+  const progressPercentage = Math.min((caloriesConsumed / caloriesTarget) * 100, 100);
 
-  // Calculs
-  function calcTotalKcal(meals: Array<{ items: Array<{ calories_100g: number; quantite_g: number }> }>): number {
-    if (!Array.isArray(meals)) return 0;
-    return meals.reduce((sum: number, meal) => {
-      if (!Array.isArray(meal.items)) return sum;
-      return (
-        sum + meal.items.reduce((s: number, item: { calories_100g: number; quantite_g: number }) => s + (item.calories_100g * item.quantite_g) / 100, 0)
-      );
-    }, 0);
-  }
-  const totalCalories = Math.round(calcTotalKcal(meals));
-  const totalRepas = meals.length;
+  const streak = loading ? 0 : calcStreak(meals);
+  const activeObjective = objectives.find((o) => o.actif);
+  const objectiveLabel = activeObjective
+    ? ({ perte_de_poids: "Perte", prise_de_masse: "Masse", amelioration_sommeil: "Sommeil", maintien_forme: "Forme", endurance: "Endurance" } as Record<string, string>)[activeObjective.libelle] ?? activeObjective.libelle
+    : "--";
 
   const currentHour = new Date().getHours();
   const greeting =
-    currentHour < 12 ? "Bonjour" : currentHour < 18 ? "Bon apres-midi" : "Bonsoir";
+    currentHour < 12 ? "Bonjour" : currentHour < 18 ? "Bon après-midi" : "Bonsoir";
+  const firstName = userName.split(" ")[0];
+
+  const recentMeals = [...meals].sort((a, b) => b.id - a.id).slice(0, 3);
 
   return (
-    <main className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
-      <header className="flex items-center justify-between px-5 py-4 bg-card/80 backdrop-blur-sm sticky top-0 z-10 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
-            <Salad className="w-4 h-4 text-primary-foreground" />
+    <main className="min-h-screen bg-background text-foreground">
+      <header className="px-5 pt-6 pb-4">
+        <div className="flex justify-between items-start max-w-md mx-auto">
+          <div>
+            <p className="text-muted-foreground text-sm font-medium">{greeting},</p>
+            <h1 className="text-2xl font-bold tracking-tight">{firstName} 👋</h1>
           </div>
-          <span className="text-lg font-semibold tracking-tight text-foreground">Jarmy</span>
+          <Link href="/dashboard/profiles">
+            <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
+              <Salad className="w-5 h-5 text-primary" />
+            </div>
+          </Link>
         </div>
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <LogOut className="w-4 h-4" />
-          <span className="hidden sm:inline">Deconnexion</span>
-        </button>
       </header>
 
-      {/* Content */}
-      <section className="flex-1 flex flex-col px-5 py-6 animate-fade-in">
-        <div className="max-w-md mx-auto w-full space-y-6">
-          {/* Greeting */}
-          <div className="space-y-1">
-            <p className="text-sm text-muted-foreground">{greeting}</p>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              {userName} !
-            </h1>
-          </div>
-
-          {/* Stats Cards */}
-          <div className="grid grid-cols-3 gap-3">
-            <StatCard
-              icon={<Flame className="w-4 h-4" />}
-              value={loading ? "..." : totalCalories.toString()}
-              label="Calories"
-              color="primary"
-            />
-            <StatCard
-              icon={<TrendingUp className="w-4 h-4" />}
-              value={loading ? "..." : totalRepas.toString()}
-              label="Repas"
-              color="success"
-            />
-            <StatCard
-              icon={<Target className="w-4 h-4" />}
-              value="--"
-              label="Objectif"
-              color="warning"
-            />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="space-y-3">
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              Actions rapides
-            </h2>
-            <nav className="space-y-2">
-              <ActionCard
-                href="/dashboard/add-meal"
-                icon={<Camera className="w-5 h-5" />}
-                title="Analyser un repas"
-                description="Utilisez l'IA pour estimer les calories"
-                primary
-              />
-              <ActionCard
-                href="/dashboard/manual-meal"
-                icon={<PenLine className="w-5 h-5" />}
-                title="Ajouter manuellement"
-                description="Composez votre repas aliment par aliment"
-              />
-              <ActionCard
-                href="/dashboard/meals"
-                icon={<History className="w-5 h-5" />}
-                title="Historique"
-                description="Consultez vos repas enregistres"
-              />
-            </nav>
-          </div>
-
-          {/* Tip */}
-          <div className="p-4 bg-accent rounded-2xl border border-border">
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                <Salad className="w-4 h-4 text-primary" />
+      <section className="px-5 pb-6 space-y-5 animate-fade-in max-w-md mx-auto">
+        {abonnement === "freemium" ? (
+          <div className="relative overflow-hidden p-5 bg-gradient-to-br from-primary to-primary/80 rounded-3xl shadow-lg shadow-primary/20 text-primary-foreground">
+            <div className="relative z-10 space-y-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5" />
+                <span className="text-xs font-bold uppercase tracking-widest opacity-90">Offre Spéciale</span>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium text-foreground">Conseil du jour</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  Pensez a boire au moins 2 litres d&apos;eau par jour pour maintenir une bonne hydratation.
-                </p>
+              <h2 className="text-xl font-black leading-tight">Débloquez l&apos;Analyse IA</h2>
+              <p className="text-sm opacity-90 max-w-[200px]">
+                Décrivez vos repas et laissez l&apos;IA compter les calories pour vous.
+              </p>
+              <Link href="/dashboard/subscribe" className="block pt-2">
+                <Button variant="secondary" className="w-full rounded-2xl font-bold gap-2 text-primary">
+                  Passer au Premium <ChevronRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+            <Zap className="absolute -bottom-4 -right-4 w-32 h-32 opacity-10 rotate-12" />
+          </div>
+        ) : (
+          <div className="p-4 bg-card border border-primary/20 rounded-3xl flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/10">
+                {abonnement === "premium_plus" ? (
+                  <Watch className="w-5 h-5 text-primary" />
+                ) : (
+                  <Sparkles className="w-5 h-5 text-primary" />
+                )}
+              </div>
+              <div>
+                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Statut du compte</p>
+                <p className="text-sm font-bold capitalize">{abonnement.replace("_", " ")}</p>
               </div>
             </div>
+            <Link href="/dashboard/subscribe">
+              <Button variant="ghost" size="sm" className="text-xs text-primary font-bold">Gérer</Button>
+            </Link>
+          </div>
+        )}
+
+        {/* Résumé Calories */}
+        <div className="p-6 bg-card border border-border rounded-3xl space-y-5">
+          <div className="flex justify-between items-end">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
+                <Flame className="w-4 h-4 text-orange-500" />
+                Calories aujourd&apos;hui
+              </p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-black">{loading ? "..." : caloriesConsumed}</span>
+                <span className="text-muted-foreground font-medium">/ {caloriesTarget} kcal</span>
+              </div>
+            </div>
+            <div className="w-14 h-14 relative shrink-0">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 48 48">
+                <circle cx="24" cy="24" r="20" fill="none" stroke="hsl(var(--muted))" strokeWidth="4" />
+                <circle
+                  cx="24" cy="24" r="20"
+                  fill="none" stroke="hsl(var(--primary))" strokeWidth="4"
+                  strokeDasharray={`${Math.min(progressPercentage, 100) * 1.2566} 125.66`}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold">
+                {Math.round(progressPercentage)}%
+              </span>
+            </div>
+          </div>
+          <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+            <div className="h-full bg-primary transition-all duration-1000 ease-out" style={{ width: `${progressPercentage}%` }} />
           </div>
         </div>
+
+        {/* Stats rapides */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="p-3 bg-card rounded-2xl border border-border text-center">
+            <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-2 mx-auto">
+              <Flame className="w-4 h-4" />
+            </div>
+            <p className="text-xl font-bold">{loading ? "..." : todayMeals.length}</p>
+            <p className="text-xs text-muted-foreground">Repas</p>
+          </div>
+          <div className="p-3 bg-card rounded-2xl border border-border text-center">
+            <div className="w-8 h-8 rounded-xl bg-success/10 text-success flex items-center justify-center mb-2 mx-auto">
+              <TrendingUp className="w-4 h-4" />
+            </div>
+            <p className="text-xl font-bold">{loading ? "..." : streak}</p>
+            <p className="text-xs text-muted-foreground">Série</p>
+          </div>
+          <Link href="/dashboard/objectives" className="block">
+            <div className="p-3 bg-card rounded-2xl border border-border text-center h-full">
+              <div className="w-8 h-8 rounded-xl bg-warning/10 text-warning flex items-center justify-center mb-2 mx-auto">
+                <Target className="w-4 h-4" />
+              </div>
+              <p className="text-xl font-bold truncate text-xs leading-tight mt-1">{loading ? "..." : objectiveLabel}</p>
+              <p className="text-xs text-muted-foreground">Objectif</p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Actions Rapides */}
+        <div className="grid grid-cols-2 gap-3">
+          <Link href="/dashboard/add-meal" className="contents">
+            <button className="flex flex-col items-center justify-center p-5 bg-card border border-border rounded-3xl gap-3 hover:border-primary/50 transition-all active:scale-95">
+              <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center text-primary">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <span className="text-sm font-bold">Analyse IA</span>
+            </button>
+          </Link>
+          <Link href="/dashboard/manual-meal" className="contents">
+            <button className="flex flex-col items-center justify-center p-5 bg-card border border-border rounded-3xl gap-3 hover:border-primary/50 transition-all active:scale-95">
+              <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center text-foreground">
+                <Plus className="w-6 h-6" />
+              </div>
+              <span className="text-sm font-bold">Ajout Manuel</span>
+            </button>
+          </Link>
+        </div>
+
+        {/* Historique récent */}
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <h3 className="font-bold flex items-center gap-2">
+              <History className="w-4 h-4 text-muted-foreground" />
+              Historique récent
+            </h3>
+            <Link href="/dashboard/meals" className="text-xs font-bold text-primary hover:underline">
+              Voir tout
+            </Link>
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center p-6">
+              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : recentMeals.length === 0 ? (
+            <div className="text-center p-8 bg-card border border-dashed border-border rounded-2xl space-y-2">
+              <p className="text-muted-foreground text-sm">Aucun repas enregistré.</p>
+              <Link href="/dashboard/manual-meal">
+                <Button variant="outline" size="sm" className="rounded-xl mt-2">Ajouter un repas</Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {recentMeals.map((meal, i) => (
+                <div key={meal.id} className="flex items-center justify-between p-4 bg-card border border-border rounded-2xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 text-xs font-bold shrink-0">
+                      {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold truncate">
+                        {REPAS_LABELS[meal.type_repas] ?? meal.type_repas}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground uppercase font-medium">
+                        {new Date(meal.date_repas).toLocaleDateString("fr-FR")}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="font-bold shrink-0 ml-2">{Math.round(meal.total_calories)} kcal</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </section>
-
-      {/* Bottom Nav */}
-      <nav className="flex items-center justify-around px-5 py-3 bg-card border-t border-border">
-        <NavItem href="/dashboard" icon={<Salad className="w-5 h-5" />} label="Accueil" active />
-        <NavItem href="/dashboard/add-meal" icon={<Camera className="w-5 h-5" />} label="Analyser" />
-        <NavItem href="/dashboard/meals" icon={<History className="w-5 h-5" />} label="Historique" />
-      </nav>
     </main>
-  );
-}
-
-function StatCard({
-  icon,
-  value,
-  label,
-  color,
-}: {
-  icon: React.ReactNode;
-  value: string;
-  label: string;
-  color: "primary" | "success" | "warning";
-}) {
-  const colors = {
-    primary: "bg-primary/10 text-primary",
-    success: "bg-success/10 text-success",
-    warning: "bg-warning/10 text-warning",
-  };
-
-  return (
-    <div className="p-3 bg-card rounded-2xl border border-border">
-      <div className={`w-8 h-8 rounded-xl ${colors[color]} flex items-center justify-center mb-2`}>
-        {icon}
-      </div>
-      <p className="text-xl font-bold text-foreground">{value}</p>
-      <p className="text-xs text-muted-foreground">{label}</p>
-    </div>
-  );
-}
-
-function ActionCard({
-  href,
-  icon,
-  title,
-  description,
-  primary = false,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  primary?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`group flex items-center gap-4 p-4 rounded-2xl transition-all active:scale-[0.99] ${
-        primary
-          ? "bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/25"
-          : "bg-card border border-border hover:border-primary/30 hover:shadow-sm"
-      }`}
-    >
-      <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-          primary ? "bg-primary-foreground/20" : "bg-accent"
-        }`}
-      >
-        <span className={primary ? "text-primary-foreground" : "text-primary"}>{icon}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <h3 className={`font-semibold ${primary ? "" : "text-foreground"}`}>{title}</h3>
-        <p className={`text-sm ${primary ? "opacity-80" : "text-muted-foreground"}`}>
-          {description}
-        </p>
-      </div>
-      <ChevronRight
-        className={`w-5 h-5 shrink-0 transition-transform group-hover:translate-x-0.5 ${
-          primary ? "opacity-80" : "text-muted-foreground"
-        }`}
-      />
-    </Link>
-  );
-}
-
-function NavItem({
-  href,
-  icon,
-  label,
-  active = false,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  label: string;
-  active?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`flex flex-col items-center gap-1 px-4 py-1 rounded-xl transition-colors ${
-        active ? "text-primary" : "text-muted-foreground hover:text-foreground"
-      }`}
-    >
-      {icon}
-      <span className="text-xs font-medium">{label}</span>
-    </Link>
   );
 }

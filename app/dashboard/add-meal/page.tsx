@@ -253,7 +253,7 @@ export default function AddMealPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer clesecrete",
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_KCAL_TOKEN}`,
         },
         body: JSON.stringify({ text }),
       });
@@ -305,9 +305,11 @@ export default function AddMealPage() {
                 <li className="flex gap-2 items-center"><Check className="w-4 h-4 text-primary"/> Calcul des calories instantané</li>
                 <li className="flex gap-2 items-center"><Check className="w-4 h-4 text-primary"/> Recommandations de l'IA</li>
               </ul>
-              <Button className="w-full h-14 rounded-2xl text-base font-semibold shadow-lg shadow-primary/20">
-                Passer au Premium - 9,99€/mois
-              </Button>
+              <Link href="/dashboard/subscribe" className="w-full">
+                <Button className="w-full h-14 rounded-2xl text-base font-semibold shadow-lg shadow-primary/20">
+                  Passer au Premium - 9,99€/mois
+                </Button>
+              </Link>
               <Link href="/dashboard/manual-meal">
                 <Button variant="ghost" className="w-full text-muted-foreground">
                   Saisie manuelle (Gratuit)

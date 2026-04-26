@@ -48,11 +48,12 @@ export default function ManualMealPage() {
   }, []);
 
   function addItem() {
-    if (!selectedAliment || !quantite || !calories100g) return;
+    const foodName = selectedAliment || alimentInput.trim();
+    if (!foodName || !quantite || !calories100g) return;
     setItems([
       ...items,
       {
-        aliment_nom: selectedAliment,
+        aliment_nom: foodName,
         quantite_g: Number(quantite),
         calories_100g: Number(calories100g),
       },
@@ -221,7 +222,7 @@ export default function ManualMealPage() {
               type="button"
               onClick={addItem}
               className="w-full h-12 rounded-xl gap-2"
-              disabled={!selectedAliment || !quantite || !calories100g}
+              disabled={!alimentInput.trim() || !quantite || !calories100g}
             >
               <Plus className="w-4 h-4" />
               Ajouter l&apos;aliment
