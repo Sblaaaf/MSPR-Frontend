@@ -4,12 +4,15 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { User, Mail, Lock, Check, ArrowRight } from "lucide-react"
+import { useTranslation } from "@/lib/i18n-context"
+import { apiFetch } from "@/lib/api"
 
 interface RegisterFormProps {
   onSuccess?: () => void
 }
 
 export function RegisterForm({ onSuccess }: RegisterFormProps) {
+  const { t } = useTranslation();
   const [nom, setNom] = useState("")
   const [prenom, setPrenom] = useState("")
   const [sexe, setSexe] = useState("")
@@ -26,46 +29,45 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
     setSuccess("")
 
     if (!nom || !prenom || !sexe) {
-      setError("Veuillez remplir tous les champs.")
+      setError(t("error_fill_all"))
       return
     }
     if (password !== confirmPassword) {
-      setError("Les mots de passe ne correspondent pas")
+      setError(t("error_passwords_mismatch"))
       return
     }
     if (password.length < 6) {
-      setError("Le mot de passe doit contenir au moins 6 caracteres")
+      setError(t("error_password_short"))
       return
     }
     setIsLoading(true)
     try {
-      const response = await fetch("http://localhost:8003/users", {
+      const response = await apiFetch("http://localhost:8003/users", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nom, prenom, email, password, sexe }),
       })
       const data = await response.json()
       if (response.ok) {
-        setSuccess("Compte cree ! Connectez-vous maintenant.")
+        setSuccess(t("signup_success"))
+        sessionStorage.setItem("pending_onboarding", "true")
         setTimeout(() => {
           onSuccess?.()
         }, 2000)
       } else {
-        setError(data.detail || "Erreur lors de la creation du compte")
+        setError(data.detail || t("error_signup"))
       }
     } catch {
-      setError("Erreur de connexion au serveur")
+      setError(t("error_server"))
     } finally {
       setIsLoading(false)
     }
   }
 
   const sexeOptions = [
-    { value: "femme", label: "Femme" },
-    { value: "homme", label: "Homme" },
-    { value: "autre", label: "Autre" },
+    { value: "femme", label: t("gender_female") },
+    { value: "homme", label: t("gender_male") },
+    { value: "autre", label: t("gender_other") },
   ]
 
   return (
@@ -76,7 +78,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
             <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Nom"
+              placeholder={t("field_lastname")}
               value={nom}
               onChange={(e) => setNom(e.target.value)}
               required
@@ -85,7 +87,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           </div>
           <Input
             type="text"
-            placeholder="Prenom"
+            placeholder={t("field_firstname")}
             value={prenom}
             onChange={(e) => setPrenom(e.target.value)}
             required
@@ -93,7 +95,6 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           />
         </div>
 
-        {/* Gender pills */}
         <div className="flex gap-2 p-1 bg-secondary rounded-xl">
           {sexeOptions.map((option) => (
             <button
@@ -115,7 +116,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             type="email"
-            placeholder="Email"
+            placeholder={t("field_email")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -127,7 +128,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             type="password"
-            placeholder="Mot de passe"
+            placeholder={t("field_password")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -140,7 +141,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             type="password"
-            placeholder="Confirmer le mot de passe"
+            placeholder={t("field_confirm_password")}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
@@ -155,7 +156,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
           <p className="text-sm text-destructive text-center">{error}</p>
         </div>
       )}
-      
+
       {success && (
         <div className="p-3 bg-primary/10 rounded-xl flex items-center justify-center gap-2">
           <Check className="w-4 h-4 text-primary" />
@@ -171,11 +172,11 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
         {isLoading ? (
           <>
             <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-            Creation...
+            {t("signup_submitting")}
           </>
         ) : (
           <>
-            Creer mon compte
+            {t("signup_submit")}
             <ArrowRight className="w-4 h-4" />
           </>
         )}

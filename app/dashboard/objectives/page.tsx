@@ -2,19 +2,12 @@
 
 import { useState, useEffect } from "react";
 import {
-  Target,
-  TrendingDown,
-  TrendingUp,
-  Moon,
-  Zap,
-  Activity,
-  CheckCircle2,
-  Circle,
-  Plus,
-  AlertCircle,
-  X,
+  Target, TrendingDown, TrendingUp, Moon, Zap, Activity,
+  CheckCircle2, Circle, Plus, AlertCircle, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n-context";
+import { apiFetch } from "@/lib/api";
 
 interface Objective {
   id: number;
@@ -30,19 +23,8 @@ interface AvailableObjectif {
   description: string;
 }
 
-const OBJECTIVE_MAP: Record<string, { label: string; icon: any; color: string }> = {
-  perte_de_poids: { label: "Perte de poids", icon: TrendingDown, color: "text-rose-500 bg-rose-500/10" },
-  prise_de_masse: { label: "Prise de masse", icon: TrendingUp, color: "text-blue-500 bg-blue-500/10" },
-  amelioration_sommeil: { label: "Mieux dormir", icon: Moon, color: "text-indigo-500 bg-indigo-500/10" },
-  maintien_forme: { label: "Maintien de forme", icon: Activity, color: "text-emerald-500 bg-emerald-500/10" },
-  endurance: { label: "Endurance", icon: Zap, color: "text-amber-500 bg-amber-500/10" },
-};
-
-function getDetails(libelle: string) {
-  return OBJECTIVE_MAP[libelle] ?? { label: libelle, icon: Target, color: "text-primary bg-primary/10" };
-}
-
 export default function ObjectivesPage() {
+  const { t, lang } = useTranslation();
   const [objectives, setObjectives] = useState<Objective[]>([]);
   const [available, setAvailable] = useState<AvailableObjectif[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,27 +33,36 @@ export default function ObjectivesPage() {
   const [adding, setAdding] = useState(false);
   const [toggling, setToggling] = useState<number | null>(null);
 
+  const OBJECTIVE_MAP: Record<string, { label: string; icon: any; color: string }> = {
+    perte_de_poids: { label: t("obj_weight_loss"), icon: TrendingDown, color: "text-rose-500 bg-rose-500/10" },
+    prise_de_masse: { label: t("obj_muscle_gain"), icon: TrendingUp, color: "text-blue-500 bg-blue-500/10" },
+    amelioration_sommeil: { label: t("obj_sleep"), icon: Moon, color: "text-indigo-500 bg-indigo-500/10" },
+    maintien_forme: { label: t("obj_maintenance"), icon: Activity, color: "text-emerald-500 bg-emerald-500/10" },
+    endurance: { label: t("obj_endurance"), icon: Zap, color: "text-amber-500 bg-amber-500/10" },
+  };
+
+  function getDetails(libelle: string) {
+    return OBJECTIVE_MAP[libelle] ?? { label: libelle, icon: Target, color: "text-primary bg-primary/10" };
+  }
+
   useEffect(() => {
     const userId = localStorage.getItem("user_id");
-    if (userId) {
-      loadData(userId);
-    } else {
-      setLoading(false);
-    }
+    if (userId) loadData(userId);
+    else setLoading(false);
   }, []);
 
   async function loadData(userId: string) {
     try {
       setLoading(true);
       const [objRes, availRes] = await Promise.all([
-        fetch(`http://localhost:8003/users/${userId}/objectives`),
-        fetch(`http://localhost:8003/objectifs`),
+        apiFetch(`http://localhost:8003/users/${userId}/objectives`),
+        apiFetch(`http://localhost:8003/objectifs`),
       ]);
       if (!objRes.ok || !availRes.ok) throw new Error();
       setObjectives(await objRes.json());
       setAvailable(await availRes.json());
     } catch {
-      setError("Impossible de charger vos objectifs.");
+      setError(t("objectives_load_error"));
     } finally {
       setLoading(false);
     }
@@ -82,7 +73,7 @@ export default function ObjectivesPage() {
     if (!userId) return;
     setAdding(true);
     try {
-      const res = await fetch(`http://localhost:8003/users/${userId}/objectives`, {
+      const res = await apiFetch(`http://localhost:8003/users/${userId}/objectives`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ objectif_id: objectifId }),
@@ -92,7 +83,7 @@ export default function ObjectivesPage() {
       setObjectives((prev) => [newObj, ...prev]);
       setShowModal(false);
     } catch {
-      setError("Erreur lors de l'ajout de l'objectif.");
+      setError(t("objectives_add_error"));
     } finally {
       setAdding(false);
     }
@@ -103,7 +94,7 @@ export default function ObjectivesPage() {
     if (!userId) return;
     setToggling(obj.id);
     try {
-      const res = await fetch(`http://localhost:8003/users/${userId}/objectives/${obj.id}`, {
+      const res = await apiFetch(`http://localhost:8003/users/${userId}/objectives/${obj.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ actif: !obj.actif }),
@@ -112,7 +103,7 @@ export default function ObjectivesPage() {
       const updated: Objective = await res.json();
       setObjectives((prev) => prev.map((o) => (o.id === obj.id ? updated : o)));
     } catch {
-      setError("Erreur lors de la mise à jour.");
+      setError(t("objectives_update_error"));
     } finally {
       setToggling(null);
     }
@@ -120,13 +111,14 @@ export default function ObjectivesPage() {
 
   const addedIds = new Set(objectives.map((o) => o.id));
   const notAdded = available.filter((a) => !addedIds.has(a.id));
+  const locale = lang === "fr" ? "fr-FR" : "en-US";
 
   return (
     <main className="min-h-screen flex flex-col bg-background text-foreground pb-20">
       <header className="flex items-center justify-between px-5 py-5 bg-background sticky top-0 z-10">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Objectifs</h1>
-          <p className="text-xs text-muted-foreground">Vos défis personnels</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("objectives_title")}</h1>
+          <p className="text-xs text-muted-foreground">{t("objectives_subtitle")}</p>
         </div>
         <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center">
           <Target className="w-5 h-5 text-primary" />
@@ -150,14 +142,12 @@ export default function ObjectivesPage() {
                 <Target className="w-8 h-8 text-muted-foreground" />
               </div>
               <div className="space-y-2">
-                <p className="font-semibold text-lg">Aucun objectif actif</p>
-                <p className="text-muted-foreground text-sm">
-                  Définissez ce que vous voulez accomplir pour obtenir un suivi sur-mesure.
-                </p>
+                <p className="font-semibold text-lg">{t("objectives_none_title")}</p>
+                <p className="text-muted-foreground text-sm">{t("objectives_none_desc")}</p>
               </div>
               <Button className="w-full rounded-2xl h-12 gap-2" onClick={() => setShowModal(true)}>
                 <Plus className="w-4 h-4" />
-                Définir un objectif
+                {t("objectives_set")}
               </Button>
             </div>
           ) : (
@@ -176,20 +166,16 @@ export default function ObjectivesPage() {
                       <div className={`p-3 rounded-2xl ${details.color}`}>
                         <Icon className="w-6 h-6" />
                       </div>
-                      <button
-                        onClick={() => handleToggle(obj)}
-                        disabled={toggling === obj.id}
-                        className="focus:outline-none"
-                      >
+                      <button onClick={() => handleToggle(obj)} disabled={toggling === obj.id} className="focus:outline-none">
                         {obj.actif ? (
                           <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors">
                             <CheckCircle2 className="w-3 h-3" />
-                            En cours
+                            {t("objectives_active")}
                           </div>
                         ) : (
                           <div className="flex items-center gap-1.5 px-3 py-1 bg-muted text-muted-foreground rounded-full text-[10px] font-bold uppercase tracking-wider hover:bg-accent transition-colors">
                             <Circle className="w-3 h-3" />
-                            Terminé
+                            {t("objectives_done")}
                           </div>
                         )}
                       </button>
@@ -200,7 +186,7 @@ export default function ObjectivesPage() {
                     </div>
                     <div className="mt-5 pt-4 border-t border-border flex items-center justify-between">
                       <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">
-                        Débuté le {new Date(obj.date_debut).toLocaleDateString("fr-FR")}
+                        {t("objectives_started")} {new Date(obj.date_debut).toLocaleDateString(locale)}
                       </div>
                     </div>
                   </div>
@@ -214,7 +200,7 @@ export default function ObjectivesPage() {
                   onClick={() => setShowModal(true)}
                 >
                   <Plus className="w-4 h-4" />
-                  Ajouter un nouvel objectif
+                  {t("objectives_add")}
                 </Button>
               )}
             </div>
@@ -222,7 +208,6 @@ export default function ObjectivesPage() {
         </div>
       </section>
 
-      {/* Modal sélection objectif */}
       {showModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-5"
@@ -230,14 +215,14 @@ export default function ObjectivesPage() {
         >
           <div className="w-full max-w-md bg-card rounded-3xl border border-border shadow-xl flex flex-col max-h-[80vh]">
             <div className="flex items-center justify-between p-5 border-b border-border shrink-0">
-              <h2 className="font-bold text-lg">Choisir un objectif</h2>
+              <h2 className="font-bold text-lg">{t("objectives_choose")}</h2>
               <button onClick={() => setShowModal(false)} className="p-2 rounded-xl hover:bg-accent transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-4 space-y-3 overflow-y-auto flex-1">
               {notAdded.length === 0 ? (
-                <p className="text-center text-muted-foreground py-6 text-sm">Vous avez déjà tous les objectifs disponibles.</p>
+                <p className="text-center text-muted-foreground py-6 text-sm">{t("objectives_all_added")}</p>
               ) : (
                 notAdded.map((a) => {
                   const details = getDetails(a.libelle);

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, BarChart2, Target, User, Activity } from "lucide-react";
+import { useTranslation } from "@/lib/i18n-context";
 
 export default function DashboardLayout({
   children,
@@ -10,17 +11,16 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { t } = useTranslation();
 
   const navItems = [
-    { href: "/dashboard", icon: LayoutDashboard, label: "Journal" },
-    { href: "/dashboard/stats", icon: BarChart2, label: "Stats" },
-    { href: "/dashboard/objectives", icon: Target, label: "Objectifs" },
-    { href: "/dashboard/health", icon: Activity, label: "Santé" },
-    { href: "/dashboard/profiles", icon: User, label: "Profil" },
+    { href: "/dashboard", icon: LayoutDashboard, label: t("nav_journal") },
+    { href: "/dashboard/stats", icon: BarChart2, label: t("nav_stats") },
+    { href: "/dashboard/objectives", icon: Target, label: t("nav_goals") },
+    { href: "/dashboard/health", icon: Activity, label: t("nav_health") },
+    { href: "/dashboard/profiles", icon: User, label: t("nav_profile") },
   ];
-  // isActive également pour les sous-pages (ex: /dashboard/health/... reste actif sur Santé)
 
-  // On cache la barre de navigation sur les pages de formulaires pour garder l'immersion
   const isFormPage =
     pathname?.includes("/add-meal") ||
     pathname?.includes("/manual-meal") ||
@@ -28,10 +28,8 @@ export default function DashboardLayout({
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      {/* Contenu de la page active */}
       <div className="flex-1 pb-20">{children}</div>
 
-      {/* Barre de navigation mobile-first en bas */}
       {!isFormPage && (
         <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-md border-t border-border shadow-[0_-5px_15px_-10px_rgba(0,0,0,0.1)]">
           <div className="flex justify-around items-center h-16 max-w-md mx-auto px-2">

@@ -4,20 +4,16 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  ArrowLeft,
-  CreditCard,
-  Check,
-  ShieldCheck,
-  Sparkles,
-  Watch,
-  AlertTriangle,
-  X,
+  ArrowLeft, CreditCard, Check, ShieldCheck, Sparkles, Watch, AlertTriangle, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTranslation } from "@/lib/i18n-context";
+import { apiFetch } from "@/lib/api";
 
 export default function SubscribePage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState<"premium" | "premium_plus" | null>(null);
   const [loading, setLoading] = useState(false);
@@ -33,18 +29,18 @@ export default function SubscribePage() {
     {
       id: "premium",
       name: "Premium",
-      price: "9,99€",
+      price: "€9.99",
       icon: Sparkles,
       color: "text-amber-500",
-      features: ["Analyse de repas par IA", "Recommandations personnalisées", "Historique illimité"],
+      features: [t("add_meal_paywall_feat1"), t("add_meal_paywall_feat2"), t("add_meal_paywall_feat3")],
     },
     {
       id: "premium_plus",
       name: "Premium+",
-      price: "19,99€",
+      price: "€19.99",
       icon: Watch,
       color: "text-primary",
-      features: ["Tout le Premium", "Données biométriques (Sommeil, BPM)", "Consultations nutritionnistes"],
+      features: ["Tout le Premium", t("health_feat_heart"), t("health_feat_sleep")],
     },
   ];
 
@@ -58,7 +54,7 @@ export default function SubscribePage() {
     setLoading(true);
     const userId = localStorage.getItem("user_id");
     try {
-      const res = await fetch(`http://localhost:8003/users/${userId}/subscription`, {
+      const res = await apiFetch(`http://localhost:8003/users/${userId}/subscription`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ abonnement: selectedPlan }),
@@ -79,7 +75,7 @@ export default function SubscribePage() {
     setCancelLoading(true);
     const userId = localStorage.getItem("user_id");
     try {
-      const res = await fetch(`http://localhost:8003/users/${userId}/subscription`, {
+      const res = await apiFetch(`http://localhost:8003/users/${userId}/subscription`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ abonnement: "freemium" }),
@@ -105,10 +101,9 @@ export default function SubscribePage() {
         <Link href="/dashboard" className="p-2 hover:bg-accent rounded-full transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="text-xl font-bold">Gérer mon abonnement</h1>
+        <h1 className="text-xl font-bold">{t("subscribe_title")}</h1>
       </header>
 
-      {/* Abonnement actuel (toujours visible sauf sur écrans de succès) */}
       {step < 3 && (
         <div className={`mb-6 p-4 rounded-2xl border flex items-center justify-between ${
           isPaid ? "bg-primary/5 border-primary/30" : "bg-card border-border"
@@ -118,29 +113,23 @@ export default function SubscribePage() {
               {isPaid ? <Sparkles className="w-4 h-4 text-primary" /> : <Watch className="w-4 h-4 text-muted-foreground" />}
             </div>
             <div>
-              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Plan actuel</p>
+              <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{t("subscribe_current_plan")}</p>
               <p className="font-bold text-sm">{PLAN_LABELS[currentPlan] ?? currentPlan}</p>
             </div>
           </div>
           {isPaid && (
-            <button
-              onClick={() => setShowCancelConfirm(true)}
-              className="text-xs font-semibold text-destructive hover:underline"
-            >
-              Résilier
+            <button onClick={() => setShowCancelConfirm(true)} className="text-xs font-semibold text-destructive hover:underline">
+              {t("subscribe_cancel")}
             </button>
           )}
         </div>
       )}
 
-      {/* Étape 1 : Choix du plan */}
       {step === 1 && (
         <div className="space-y-6 animate-fade-in">
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold">
-              {isPaid ? "Changer de plan" : "Choisissez votre plan"}
-            </h2>
-            <p className="text-muted-foreground text-sm">Passez à la vitesse supérieure pour votre santé.</p>
+            <h2 className="text-2xl font-bold">{isPaid ? t("subscribe_change") : t("subscribe_choose")}</h2>
+            <p className="text-muted-foreground text-sm">{t("subscribe_choose_subtitle")}</p>
           </div>
 
           <div className="grid gap-4">
@@ -165,14 +154,14 @@ export default function SubscribePage() {
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-black">{plan.price}</p>
-                      <p className="text-xs text-muted-foreground">par mois</p>
+                      <p className="text-xs text-muted-foreground">{t("subscribe_per_month")}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 mb-3">
                     <h3 className="text-lg font-bold">{plan.name}</h3>
                     {isCurrent && (
                       <span className="text-[10px] font-bold uppercase tracking-widest bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                        Actuel
+                        {t("subscribe_current")}
                       </span>
                     )}
                   </div>
@@ -188,86 +177,74 @@ export default function SubscribePage() {
             })}
           </div>
 
-          <Button
-            className="w-full h-14 rounded-2xl text-base font-bold"
-            disabled={!selectedPlan}
-            onClick={() => setStep(2)}
-          >
-            Continuer vers le paiement
+          <Button className="w-full h-14 rounded-2xl text-base font-bold" disabled={!selectedPlan} onClick={() => setStep(2)}>
+            {t("subscribe_continue_payment")}
           </Button>
         </div>
       )}
 
-      {/* Étape 2 : Paiement */}
       {step === 2 && (
         <div className="space-y-6 animate-slide-up">
           <div className="p-6 bg-card border border-border rounded-3xl space-y-4">
             <div className="flex items-center gap-3 mb-2">
               <CreditCard className="w-5 h-5 text-primary" />
-              <h3 className="font-bold">Paiement Sécurisé</h3>
+              <h3 className="font-bold">{t("subscribe_payment_title")}</h3>
             </div>
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-muted-foreground">Numéro de carte</label>
+                <label className="text-xs font-bold uppercase text-muted-foreground">{t("subscribe_card")}</label>
                 <Input placeholder="4242 4242 4242 4242" className="h-12 rounded-xl" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase text-muted-foreground">Expiration</label>
+                  <label className="text-xs font-bold uppercase text-muted-foreground">{t("subscribe_expiry")}</label>
                   <Input placeholder="MM/YY" className="h-12 rounded-xl" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase text-muted-foreground">CVC</label>
+                  <label className="text-xs font-bold uppercase text-muted-foreground">{t("subscribe_cvc")}</label>
                   <Input placeholder="123" className="h-12 rounded-xl" />
                 </div>
               </div>
             </div>
             <div className="pt-4 flex items-center gap-2 text-[10px] text-muted-foreground">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              Vos données sont cryptées et sécurisées.
+              {t("subscribe_secure")}
             </div>
           </div>
 
-          <Button
-            className="w-full h-14 rounded-2xl text-base font-bold"
-            onClick={handleUpgrade}
-            disabled={loading}
-          >
-            {loading ? "Traitement..." : `Payer ${plans.find((p) => p.id === selectedPlan)?.price}`}
+          <Button className="w-full h-14 rounded-2xl text-base font-bold" onClick={handleUpgrade} disabled={loading}>
+            {loading ? t("subscribe_processing") : `${t("subscribe_pay")} ${plans.find((p) => p.id === selectedPlan)?.price}`}
           </Button>
           <Button variant="ghost" className="w-full" onClick={() => setStep(1)}>
-            Modifier le plan
+            {t("subscribe_modify_plan")}
           </Button>
         </div>
       )}
 
-      {/* Étape 3 : Succès upgrade */}
       {step === 3 && (
         <div className="flex flex-col items-center justify-center py-20 space-y-6 animate-scale-in">
           <div className="w-20 h-20 bg-emerald-500/10 rounded-full flex items-center justify-center">
             <Check className="w-10 h-10 text-emerald-500" />
           </div>
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold">Félicitations !</h2>
-            <p className="text-muted-foreground">Votre compte a été mis à jour avec succès.</p>
+            <h2 className="text-2xl font-bold">{t("subscribe_success_title")}</h2>
+            <p className="text-muted-foreground">{t("subscribe_success_desc")}</p>
           </div>
         </div>
       )}
 
-      {/* Étape 4 : Succès résiliation */}
       {step === 4 && (
         <div className="flex flex-col items-center justify-center py-20 space-y-6 animate-scale-in">
           <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
             <Check className="w-10 h-10 text-muted-foreground" />
           </div>
           <div className="text-center space-y-2">
-            <h2 className="text-2xl font-bold">Abonnement résilié</h2>
-            <p className="text-muted-foreground">Votre compte est repassé en Freemium.</p>
+            <h2 className="text-2xl font-bold">{t("subscribe_cancel_success_title")}</h2>
+            <p className="text-muted-foreground">{t("subscribe_cancel_success_desc")}</p>
           </div>
         </div>
       )}
 
-      {/* Modale confirmation résiliation */}
       {showCancelConfirm && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-5"
@@ -283,27 +260,19 @@ export default function SubscribePage() {
               </button>
             </div>
             <div className="space-y-2">
-              <h3 className="font-bold text-lg">Résilier l'abonnement ?</h3>
+              <h3 className="font-bold text-lg">{t("subscribe_cancel_confirm_title")}</h3>
               <p className="text-sm text-muted-foreground">
-                Vous perdrez l'accès aux fonctionnalités{" "}
-                <strong>{PLAN_LABELS[currentPlan]}</strong> et reviendrez au plan Freemium.
+                {t("subscribe_cancel_confirm_desc")}{" "}
+                <strong>{PLAN_LABELS[currentPlan]}</strong>{" "}
+                {t("subscribe_cancel_confirm_desc2")}
               </p>
             </div>
             <div className="space-y-2">
-              <Button
-                variant="destructive"
-                className="w-full h-12 rounded-xl"
-                onClick={handleCancel}
-                disabled={cancelLoading}
-              >
-                {cancelLoading ? "Résiliation..." : "Confirmer la résiliation"}
+              <Button variant="destructive" className="w-full h-12 rounded-xl" onClick={handleCancel} disabled={cancelLoading}>
+                {cancelLoading ? t("subscribe_cancelling") : t("subscribe_cancel_cta")}
               </Button>
-              <Button
-                variant="ghost"
-                className="w-full h-12 rounded-xl"
-                onClick={() => setShowCancelConfirm(false)}
-              >
-                Annuler
+              <Button variant="ghost" className="w-full h-12 rounded-xl" onClick={() => setShowCancelConfirm(false)}>
+                {t("cancel")}
               </Button>
             </div>
           </div>

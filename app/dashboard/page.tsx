@@ -16,6 +16,8 @@ import {
   Target,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n-context";
+import { apiFetch } from "@/lib/api";
 
 interface MealLineResponse {
   calories_calculees: number;
@@ -54,17 +56,11 @@ function calcStreak(meals: MealResponse[]): number {
   return streak;
 }
 
-const REPAS_LABELS: Record<string, string> = {
-  petit_dejeuner: "Petit-déjeuner",
-  dejeuner: "Déjeuner",
-  diner: "Dîner",
-  collation: "Collation",
-};
-
 export default function Dashboard() {
   const router = useRouter();
+  const { t, lang } = useTranslation();
   const [mounted, setMounted] = useState(false);
-  const [userName, setUserName] = useState("Ami de Jarmy");
+  const [userName, setUserName] = useState("Jarmy");
   const [abonnement, setAbonnement] = useState("freemium");
   const [meals, setMeals] = useState<MealResponse[]>([]);
   const [objectives, setObjectives] = useState<Objective[]>([]);
@@ -77,12 +73,12 @@ export default function Dashboard() {
       router.replace("/login");
       return;
     }
-    setUserName(localStorage.getItem("user_name") || "Ami de Jarmy");
+    setUserName(localStorage.getItem("user_name") || "Jarmy");
     setAbonnement(localStorage.getItem("user_abonnement") || "freemium");
 
     Promise.all([
-      fetch(`http://localhost:8003/users/${userId}/meals`).then((r) => r.json()),
-      fetch(`http://localhost:8003/users/${userId}/objectives`).then((r) => r.json()),
+      apiFetch(`http://localhost:8003/users/${userId}/meals`).then((r) => r.json()),
+      apiFetch(`http://localhost:8003/users/${userId}/objectives`).then((r) => r.json()),
     ])
       .then(([mealsData, objData]) => {
         setMeals(Array.isArray(mealsData) ? mealsData : []);
@@ -104,14 +100,30 @@ export default function Dashboard() {
 
   const streak = loading ? 0 : calcStreak(meals);
   const activeObjective = objectives.find((o) => o.actif);
+
+  const OBJ_LABELS: Record<string, string> = {
+    perte_de_poids: t("obj_weight_loss"),
+    prise_de_masse: t("obj_muscle_gain"),
+    amelioration_sommeil: t("obj_sleep"),
+    maintien_forme: t("obj_maintenance"),
+    endurance: t("obj_endurance"),
+  };
+
   const objectiveLabel = activeObjective
-    ? ({ perte_de_poids: "Perte", prise_de_masse: "Masse", amelioration_sommeil: "Sommeil", maintien_forme: "Forme", endurance: "Endurance" } as Record<string, string>)[activeObjective.libelle] ?? activeObjective.libelle
+    ? (OBJ_LABELS[activeObjective.libelle] ?? activeObjective.libelle)
     : "--";
 
   const currentHour = new Date().getHours();
   const greeting =
-    currentHour < 12 ? "Bonjour" : currentHour < 18 ? "Bon après-midi" : "Bonsoir";
+    currentHour < 12 ? t("greeting_morning") : currentHour < 18 ? t("greeting_afternoon") : t("greeting_evening");
   const firstName = userName.split(" ")[0];
+
+  const REPAS_LABELS: Record<string, string> = {
+    petit_dejeuner: t("meal_type_breakfast"),
+    dejeuner: t("meal_type_lunch"),
+    diner: t("meal_type_dinner"),
+    collation: t("meal_type_snack"),
+  };
 
   const recentMeals = [...meals].sort((a, b) => b.id - a.id).slice(0, 3);
 
@@ -137,15 +149,13 @@ export default function Dashboard() {
             <div className="relative z-10 space-y-3">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5" />
-                <span className="text-xs font-bold uppercase tracking-widest opacity-90">Offre Spéciale</span>
+                <span className="text-xs font-bold uppercase tracking-widest opacity-90">{t("dashboard_special_offer")}</span>
               </div>
-              <h2 className="text-xl font-black leading-tight">Débloquez l&apos;Analyse IA</h2>
-              <p className="text-sm opacity-90 max-w-[200px]">
-                Décrivez vos repas et laissez l&apos;IA compter les calories pour vous.
-              </p>
+              <h2 className="text-xl font-black leading-tight">{t("dashboard_unlock_ai")}</h2>
+              <p className="text-sm opacity-90 max-w-[200px]">{t("dashboard_unlock_ai_desc")}</p>
               <Link href="/dashboard/subscribe" className="block pt-2">
                 <Button variant="secondary" className="w-full rounded-2xl font-bold gap-2 text-primary">
-                  Passer au Premium <ChevronRight className="w-4 h-4" />
+                  {t("dashboard_go_premium")} <ChevronRight className="w-4 h-4" />
                 </Button>
               </Link>
             </div>
@@ -162,12 +172,12 @@ export default function Dashboard() {
                 )}
               </div>
               <div>
-                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">Statut du compte</p>
+                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{t("dashboard_account_status")}</p>
                 <p className="text-sm font-bold capitalize">{abonnement.replace("_", " ")}</p>
               </div>
             </div>
             <Link href="/dashboard/subscribe">
-              <Button variant="ghost" size="sm" className="text-xs text-primary font-bold">Gérer</Button>
+              <Button variant="ghost" size="sm" className="text-xs text-primary font-bold">{t("manage")}</Button>
             </Link>
           </div>
         )}
@@ -178,7 +188,7 @@ export default function Dashboard() {
             <div className="space-y-1">
               <p className="text-sm font-medium text-muted-foreground flex items-center gap-1.5">
                 <Flame className="w-4 h-4 text-orange-500" />
-                Calories aujourd&apos;hui
+                {t("dashboard_calories_today")}
               </p>
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black">{loading ? "..." : caloriesConsumed}</span>
@@ -212,14 +222,14 @@ export default function Dashboard() {
               <Flame className="w-4 h-4" />
             </div>
             <p className="text-xl font-bold">{loading ? "..." : todayMeals.length}</p>
-            <p className="text-xs text-muted-foreground">Repas</p>
+            <p className="text-xs text-muted-foreground">{t("dashboard_meals")}</p>
           </div>
           <div className="p-3 bg-card rounded-2xl border border-border text-center">
             <div className="w-8 h-8 rounded-xl bg-success/10 text-success flex items-center justify-center mb-2 mx-auto">
               <TrendingUp className="w-4 h-4" />
             </div>
             <p className="text-xl font-bold">{loading ? "..." : streak}</p>
-            <p className="text-xs text-muted-foreground">Série</p>
+            <p className="text-xs text-muted-foreground">{t("dashboard_streak")}</p>
           </div>
           <Link href="/dashboard/objectives" className="block">
             <div className="p-3 bg-card rounded-2xl border border-border text-center h-full">
@@ -227,7 +237,7 @@ export default function Dashboard() {
                 <Target className="w-4 h-4" />
               </div>
               <p className="text-xl font-bold truncate text-xs leading-tight mt-1">{loading ? "..." : objectiveLabel}</p>
-              <p className="text-xs text-muted-foreground">Objectif</p>
+              <p className="text-xs text-muted-foreground">{t("dashboard_goal")}</p>
             </div>
           </Link>
         </div>
@@ -239,7 +249,7 @@ export default function Dashboard() {
               <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center text-primary">
                 <Sparkles className="w-6 h-6" />
               </div>
-              <span className="text-sm font-bold">Analyse IA</span>
+              <span className="text-sm font-bold">{t("dashboard_ai_analysis")}</span>
             </button>
           </Link>
           <Link href="/dashboard/manual-meal" className="contents">
@@ -247,7 +257,7 @@ export default function Dashboard() {
               <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center text-foreground">
                 <Plus className="w-6 h-6" />
               </div>
-              <span className="text-sm font-bold">Ajout Manuel</span>
+              <span className="text-sm font-bold">{t("dashboard_manual_entry")}</span>
             </button>
           </Link>
         </div>
@@ -257,10 +267,10 @@ export default function Dashboard() {
           <div className="flex justify-between items-center">
             <h3 className="font-bold flex items-center gap-2">
               <History className="w-4 h-4 text-muted-foreground" />
-              Historique récent
+              {t("dashboard_recent_history")}
             </h3>
             <Link href="/dashboard/meals" className="text-xs font-bold text-primary hover:underline">
-              Voir tout
+              {t("dashboard_see_all")}
             </Link>
           </div>
 
@@ -270,9 +280,9 @@ export default function Dashboard() {
             </div>
           ) : recentMeals.length === 0 ? (
             <div className="text-center p-8 bg-card border border-dashed border-border rounded-2xl space-y-2">
-              <p className="text-muted-foreground text-sm">Aucun repas enregistré.</p>
+              <p className="text-muted-foreground text-sm">{t("dashboard_no_meals")}</p>
               <Link href="/dashboard/manual-meal">
-                <Button variant="outline" size="sm" className="rounded-xl mt-2">Ajouter un repas</Button>
+                <Button variant="outline" size="sm" className="rounded-xl mt-2">{t("dashboard_add_meal")}</Button>
               </Link>
             </div>
           ) : (
@@ -288,7 +298,7 @@ export default function Dashboard() {
                         {REPAS_LABELS[meal.type_repas] ?? meal.type_repas}
                       </p>
                       <p className="text-[10px] text-muted-foreground uppercase font-medium">
-                        {new Date(meal.date_repas).toLocaleDateString("fr-FR")}
+                        {new Date(meal.date_repas).toLocaleDateString(lang === "fr" ? "fr-FR" : "en-US")}
                       </p>
                     </div>
                   </div>

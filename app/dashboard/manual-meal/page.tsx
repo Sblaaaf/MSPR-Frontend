@@ -12,6 +12,8 @@ import {
   PenLine,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/lib/i18n-context";
+import { apiFetch } from "@/lib/api";
 
 interface AlimentItem {
   aliment_nom: string;
@@ -25,6 +27,7 @@ interface Aliment {
 }
 
 export default function ManualMealPage() {
+  const { t, lang } = useTranslation();
   const [aliments, setAliments] = useState<Aliment[]>([]);
   const [selectedAliment, setSelectedAliment] = useState("");
   const [alimentInput, setAlimentInput] = useState("");
@@ -41,10 +44,10 @@ export default function ManualMealPage() {
   const [showSuggestions, setShowSuggestions] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:8003/aliments")
+    apiFetch("http://localhost:8003/aliments")
       .then((res) => res.json())
       .then((data) => setAliments(data))
-      .catch(() => setError("Erreur lors du chargement des aliments"));
+      .catch(() => setError(t("manual_load_error")));
   }, []);
 
   function addItem() {
@@ -72,38 +75,24 @@ export default function ManualMealPage() {
     e.preventDefault();
     setError("");
     setSuccess("");
-    if (!dateRepas) {
-      setError("Veuillez renseigner la date du repas.");
-      return;
-    }
-    if (!typeRepas) {
-      setError("Veuillez selectionner le type de repas.");
-      return;
-    }
-    if (!items.length) {
-      setError("Veuillez ajouter au moins un aliment.");
-      return;
-    }
+    if (!dateRepas) { setError(t("manual_date_error")); return; }
+    if (!typeRepas) { setError(t("manual_type_error")); return; }
+    if (!items.length) { setError(t("manual_items_error")); return; }
     setLoading(true);
     try {
       const userId = localStorage.getItem("user_id") || "1";
-      const res = await fetch(`http://localhost:8003/users/${userId}/meals`, {
+      const res = await apiFetch(`http://localhost:8003/users/${userId}/meals`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type_repas: typeRepas,
-          date_repas: dateRepas,
-          notes,
-          items,
-        }),
+        body: JSON.stringify({ type_repas: typeRepas, date_repas: dateRepas, notes, items }),
       });
       if (!res.ok) throw new Error();
-      setSuccess("Repas ajoute !");
+      setSuccess(t("manual_success"));
       setItems([]);
       setNotes("");
       setDateRepas(today);
     } catch {
-      setError("Erreur lors de l'ajout du repas");
+      setError(t("manual_error"));
     } finally {
       setLoading(false);
     }
@@ -118,22 +107,21 @@ export default function ManualMealPage() {
   );
 
   const mealTypes = [
-    { value: "petit_dejeuner", label: "Petit-dej" },
-    { value: "dejeuner", label: "Dejeuner" },
-    { value: "diner", label: "Diner" },
-    { value: "collation", label: "Collation" },
+    { value: "petit_dejeuner", label: t("meal_type_breakfast") },
+    { value: "dejeuner", label: t("meal_type_lunch") },
+    { value: "diner", label: t("meal_type_dinner") },
+    { value: "collation", label: t("meal_type_snack") },
   ];
 
   return (
     <main className="min-h-screen flex flex-col bg-background">
-      {/* Header */}
       <header className="flex items-center justify-between px-5 py-4 bg-card/80 backdrop-blur-sm sticky top-0 z-10 border-b border-border">
         <Link
           href="/dashboard"
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="text-sm font-medium">Retour</span>
+          <span className="text-sm font-medium">{t("back")}</span>
         </Link>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
@@ -143,29 +131,25 @@ export default function ManualMealPage() {
         <div className="w-16" />
       </header>
 
-      {/* Content */}
       <section className="flex-1 flex flex-col px-5 py-6 animate-fade-in">
         <div className="max-w-md mx-auto w-full space-y-6">
-          {/* Title */}
           <div className="text-center space-y-2">
             <div className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center mx-auto mb-4">
               <PenLine className="w-7 h-7 text-primary" />
             </div>
             <h1 className="text-xl font-bold tracking-tight text-foreground">
-              Ajout manuel
+              {t("manual_meal_title")}
             </h1>
-            <p className="text-muted-foreground text-sm">
-              Composez votre repas aliment par aliment
-            </p>
+            <p className="text-muted-foreground text-sm">{t("manual_meal_subtitle")}</p>
           </div>
 
           {/* Search aliment */}
           <div className="space-y-3">
             <div className="relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
               <input
                 type="text"
-                placeholder="Rechercher un aliment..."
+                placeholder={t("manual_search_placeholder")}
                 value={alimentInput}
                 onChange={(e) => {
                   setAlimentInput(e.target.value);
@@ -176,6 +160,11 @@ export default function ManualMealPage() {
                 className="w-full h-12 pl-11 pr-4 bg-card border border-border rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
                 autoComplete="off"
               />
+              {lang === "fr" && (
+                <p className="mt-1 text-[11px] text-muted-foreground pl-1">
+                  💡 La base de données est en anglais — écrivez en anglais (ex: chicken, rice, apple)
+                </p>
+              )}
               {showSuggestions && alimentInput && filteredAliments.length > 0 && (
                 <ul className="absolute z-20 w-full mt-2 bg-card border border-border rounded-xl shadow-lg max-h-64 overflow-y-auto animate-scale-in">
                   {filteredAliments.map((a, idx) => (
@@ -203,7 +192,7 @@ export default function ManualMealPage() {
               <input
                 type="number"
                 min="1"
-                placeholder="Quantite (g)"
+                placeholder={t("manual_quantity")}
                 value={quantite}
                 onChange={(e) => setQuantite(e.target.value)}
                 className="h-12 px-4 bg-card border border-border rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -211,7 +200,7 @@ export default function ManualMealPage() {
               <input
                 type="number"
                 min="0"
-                placeholder="Kcal/100g"
+                placeholder={t("manual_kcal")}
                 value={calories100g}
                 onChange={(e) => setCalories100g(e.target.value)}
                 className="h-12 px-4 bg-card border border-border rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -225,7 +214,7 @@ export default function ManualMealPage() {
               disabled={!alimentInput.trim() || !quantite || !calories100g}
             >
               <Plus className="w-4 h-4" />
-              Ajouter l&apos;aliment
+              {t("manual_add_food")}
             </Button>
           </div>
 
@@ -234,7 +223,7 @@ export default function ManualMealPage() {
             <div className="p-4 bg-card rounded-2xl border border-border space-y-3 animate-slide-up">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-foreground">
-                  Aliments ({items.length})
+                  {t("manual_foods_count")} ({items.length})
                 </p>
                 <p className="text-sm font-bold text-primary">{totalKcal} kcal</p>
               </div>
@@ -269,10 +258,9 @@ export default function ManualMealPage() {
           {/* Meal details */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-              Details du repas
+              {t("manual_meal_details")}
             </p>
 
-            {/* Meal type pills */}
             <div className="flex flex-wrap gap-2">
               {mealTypes.map((type) => (
                 <button
@@ -298,7 +286,7 @@ export default function ManualMealPage() {
             />
 
             <textarea
-              placeholder="Notes (optionnel)"
+              placeholder={t("notes_placeholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               className="w-full h-20 p-4 bg-card border border-border rounded-xl text-sm resize-none placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -312,12 +300,12 @@ export default function ManualMealPage() {
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                  Enregistrement...
+                  {t("manual_saving")}
                 </>
               ) : (
                 <>
                   <Check className="w-5 h-5" />
-                  Enregistrer le repas
+                  {t("manual_save")}
                 </>
               )}
             </Button>
