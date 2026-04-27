@@ -80,7 +80,7 @@ export default function LoginPage() {
         </p>
         <div className="flex justify-end">
           <button
-            onClick={() => window.location.href = "/admin"}
+            onClick={() => window.location.href = "/admin/login"}
             className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors bg-secondary px-3 py-1.5 rounded-full"
           >
             Admin
