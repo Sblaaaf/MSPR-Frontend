@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Salad } from "lucide-react"
 import { LoginForm } from "@/components/auth/login-form"
 import { RegisterForm } from "@/components/auth/register-form"
 import { useTranslation } from "@/lib/i18n-context"
@@ -14,12 +13,7 @@ export default function LoginPage() {
     <main className="min-h-screen flex flex-col bg-background">
       <header className="flex items-center justify-between px-5 py-4 bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="w-16" />
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
-            <Salad className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-semibold tracking-tight text-foreground">Jarmy</span>
-        </div>
+        <img src="/JARMY-logo.svg" alt="Jarmy" className="h-8" />
         <button
           onClick={() => setLang(lang === "en" ? "fr" : "en")}
           className="text-xs font-bold text-muted-foreground hover:text-foreground transition-colors bg-secondary px-3 py-1.5 rounded-full"
@@ -31,9 +25,7 @@ export default function LoginPage() {
       <section className="flex-1 flex flex-col items-center justify-center px-5 py-8 animate-fade-in">
         <div className="w-full max-w-sm space-y-8">
           <div className="flex justify-center">
-            <div className="w-16 h-16 rounded-2xl bg-accent flex items-center justify-center">
-              <Salad className="w-8 h-8 text-primary" />
-            </div>
+            <img src="/JARMY-logo-02.svg" alt="Jarmy" className="h-16" />
           </div>
 
           <div className="text-center space-y-2">

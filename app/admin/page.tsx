@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Salad, LogOut } from "lucide-react"
+import { LogOut } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function AdminPage() {
@@ -46,21 +46,21 @@ export default function AdminPage() {
   return (
     <main className="min-h-screen flex flex-col bg-background">
       <header className="flex items-center justify-between px-5 py-4 bg-card/80 backdrop-blur-sm sticky top-0 z-10 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center">
-            <Salad className="w-4 h-4 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-semibold tracking-tight text-foreground">Jarmy Admin</span>
+        <a href="/dashboard/profiles" className="flex items-center">
+          <img src="/JARMY-logo-01.svg" alt="Jarmy" className="h-8" />
+        </a>
+        <div className="flex items-center gap-4">
+          <span className="text-lg font-semibold tracking-tight text-foreground">Admin</span>
+          <Button
+            onClick={handleLogout}
+            variant="ghost"
+            size="sm"
+            className="gap-2"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </Button>
         </div>
-        <Button
-          onClick={handleLogout}
-          variant="ghost"
-          size="sm"
-          className="gap-2"
-        >
-          <LogOut className="w-4 h-4" />
-          Logout
-        </Button>
       </header>
 
       <section className="flex-1 flex flex-col items-center justify-center px-5 py-8">

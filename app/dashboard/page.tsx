@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Salad,
   Sparkles,
   Plus,
   Flame,
@@ -137,7 +136,7 @@ export default function Dashboard() {
           </div>
           <Link href="/dashboard/profiles">
             <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
-              <Salad className="w-5 h-5 text-primary" />
+              <img src="/JARMY-logo-02.svg" alt="Jarmy" className="w-5 h-5" />
             </div>
           </Link>
         </div>
@@ -244,20 +243,20 @@ export default function Dashboard() {
 
         {/* Actions Rapides */}
         <div className="grid grid-cols-2 gap-3">
-          <Link href="/dashboard/add-meal" className="contents">
-            <button className="flex flex-col items-center justify-center p-5 bg-card border border-border rounded-3xl gap-3 hover:border-primary/50 transition-all active:scale-95">
-              <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center text-primary">
-                <Sparkles className="w-6 h-6" />
-              </div>
-              <span className="text-sm font-bold">{t("dashboard_ai_analysis")}</span>
-            </button>
-          </Link>
           <Link href="/dashboard/manual-meal" className="contents">
             <button className="flex flex-col items-center justify-center p-5 bg-card border border-border rounded-3xl gap-3 hover:border-primary/50 transition-all active:scale-95">
               <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center text-foreground">
                 <Plus className="w-6 h-6" />
               </div>
               <span className="text-sm font-bold">{t("dashboard_manual_entry")}</span>
+            </button>
+          </Link>
+          <Link href="/dashboard/add-meal" className="contents">
+            <button className="flex flex-col items-center justify-center p-5 bg-card border border-border rounded-3xl gap-3 hover:border-primary/50 transition-all active:scale-95">
+              <div className="w-12 h-12 rounded-2xl bg-accent flex items-center justify-center text-primary">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <span className="text-sm font-bold">{t("dashboard_ai_analysis")}</span>
             </button>
           </Link>
         </div>
