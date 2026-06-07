@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "@/lib/i18n-context";
 import { apiFetch } from "@/lib/api";
+import NutritionBalanceCard from "@/components/nutrition-balance-card";
 
 interface MealLineResponse {
   calories_calculees: number;
@@ -217,6 +218,9 @@ export default function Dashboard() {
             <div className="h-full bg-primary transition-all duration-1000 ease-out" style={{ width: `${progressPercentage}%` }} />
           </div>
         </div>
+
+        {/* Bilan nutritionnel du jour (déséquilibres + conseils) — Premium */}
+        {abonnement !== "freemium" && <NutritionBalanceCard />}
 
         {/* Stats rapides */}
         <div className="grid grid-cols-3 gap-3">
