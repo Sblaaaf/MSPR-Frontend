@@ -1,12 +1,12 @@
 "use client"
 
 import { useCallback, useEffect, useRef, useState } from "react"
-import Link from "next/link"
 import {
-  ArrowLeft, ChevronLeft, ChevronRight,
+  ChevronLeft, ChevronRight,
   Database, Download, ExternalLink, Pencil,
   RefreshCw, Search, Trash2, Upload, X,
 } from "lucide-react"
+import { AdminNav } from "@/components/admin/admin-nav"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -559,27 +559,20 @@ export default function DataPage() {
           onSave={handleEdit} onClose={() => setEditingRow(null)} />
       )}
 
-      <header className="flex items-center gap-4 px-6 py-4 border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
-        <Link href="/admin" aria-label="Retour">
-          <ArrowLeft className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
-        </Link>
-        <nav className="flex gap-4 text-sm">
-          <Link href="/admin" className="text-muted-foreground hover:text-foreground transition-colors">Vue d'ensemble</Link>
-          <span className="font-semibold text-foreground" aria-current="page">Données</span>
-          <Link href="/admin/analytics" className="text-muted-foreground hover:text-foreground transition-colors">Analytics</Link>
-        </nav>
-      </header>
+      <AdminNav current="data" />
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList>
+          <div className="overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className="w-max">
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
             <TabsTrigger value="foods">Aliments</TabsTrigger>
             <TabsTrigger value="exercises">Exercices</TabsTrigger>
             <TabsTrigger value="metrics">Métriques</TabsTrigger>
             <TabsTrigger value="approvals">Anomalies</TabsTrigger>
             <TabsTrigger value="datasets">Datasets</TabsTrigger>
-          </TabsList>
+            </TabsList>
+          </div>
 
           {/* ── Onglets tabulaires ── */}
           {(["users", "foods", "exercises", "metrics"] as const).map(t => (

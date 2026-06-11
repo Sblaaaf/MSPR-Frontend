@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { LogOut, RefreshCw, AlertTriangle, CheckCircle2, Database, Users, Salad, Dumbbell, BarChart3 } from "lucide-react"
+import { RefreshCw, AlertTriangle, CheckCircle2, Database, Users, Salad, Dumbbell, BarChart3 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
+import { AdminNav } from "@/components/admin/admin-nav"
 import { adminApi } from "@/lib/admin-api"
 
 function StatCard({ icon: Icon, label, value, sub }: { icon: any; label: string; value: any; sub?: string }) {
@@ -99,31 +100,23 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      <header className="flex items-center justify-between px-6 py-4 border-b bg-card/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="flex items-center gap-6">
-          <img src="/JARMY-logo-01.svg" alt="Jarmy" className="h-7" />
-          <nav className="flex gap-4 text-sm" aria-label="Navigation admin">
-            <span className="font-semibold text-foreground" aria-current="page">Vue d'ensemble</span>
-            <Link href="/admin/data" className="text-muted-foreground hover:text-foreground transition-colors">Données</Link>
-            <Link href="/admin/analytics" className="text-muted-foreground hover:text-foreground transition-colors">Analytics</Link>
-          </nav>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={load} disabled={loading} aria-label="Actualiser">
-            <RefreshCw className={`w-4 h-4 mr-1 ${loading ? "animate-spin" : ""}`} />
-            Actualiser
-          </Button>
-          <Button variant="outline" size="sm" onClick={triggerEtl} disabled={runningEtl} aria-label="Lancer le pipeline ETL">
-            <Database className="w-4 h-4 mr-1" />
-            {runningEtl ? "Démarrage…" : "Lancer ETL"}
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => { localStorage.clear(); router.push("/login") }} aria-label="Déconnexion">
-            <LogOut className="w-4 h-4" />
-          </Button>
-        </div>
-      </header>
+      <AdminNav
+        current="overview"
+        actions={
+          <>
+            <Button variant="outline" size="sm" onClick={load} disabled={loading} aria-label="Actualiser">
+              <RefreshCw className={`w-4 h-4 sm:mr-1 ${loading ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">Actualiser</span>
+            </Button>
+            <Button variant="outline" size="sm" onClick={triggerEtl} disabled={runningEtl} aria-label="Lancer le pipeline ETL">
+              <Database className="w-4 h-4 sm:mr-1" />
+              <span className="hidden sm:inline">{runningEtl ? "Démarrage…" : "Lancer ETL"}</span>
+            </Button>
+          </>
+        }
+      />
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
 
         {/* Score qualité + ETL */}
         <section aria-labelledby="qualite-heading" className="grid grid-cols-1 md:grid-cols-3 gap-6">
