@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { I18nProvider } from '@/lib/i18n-context'
+import { OfflineBanner } from '@/components/offline-banner'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -33,7 +34,10 @@ export default function RootLayout({
   return (
     <html lang="fr" className={inter.variable}>
       <body className="font-sans antialiased" suppressHydrationWarning>
-        <I18nProvider>{children}</I18nProvider>
+        <I18nProvider>
+          <OfflineBanner />
+          {children}
+        </I18nProvider>
       </body>
     </html>
   )

@@ -14,6 +14,7 @@ export const translations = {
     add: "Add",
     manage: "Manage",
     error_server: "Server connection error",
+    offline_banner: "No network connection! Some features require a connection to the server to work. Please check your connection and try again.",
 
     // Auth – login page
     signin: "Sign in",
@@ -349,6 +350,7 @@ export const translations = {
     add: "Ajouter",
     manage: "Gérer",
     error_server: "Erreur de connexion au serveur",
+    offline_banner: "Attention, aucun réseau ! Certaines fonctionnalités nécessitent une connexion au serveur pour fonctionner. Vérifiez votre connexion et réessayez.",
 
     // Auth – login page
     signin: "Connexion",
