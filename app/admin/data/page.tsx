@@ -553,7 +553,7 @@ export default function DataPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main id="main-content" className="min-h-screen bg-background">
       {editingRow && EDIT_FIELDS[tab] && (
         <EditModal row={editingRow} fields={EDIT_FIELDS[tab]}
           onSave={handleEdit} onClose={() => setEditingRow(null)} />

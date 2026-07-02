@@ -114,7 +114,7 @@ export default function ObjectivesPage() {
   const locale = lang === "fr" ? "fr-FR" : "en-US";
 
   return (
-    <main className="min-h-screen flex flex-col bg-background text-foreground pb-20">
+    <main id="main-content" className="min-h-screen flex flex-col bg-background text-foreground pb-20">
       <header className="flex items-center justify-between px-5 py-5 bg-background sticky top-0 z-10">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t("objectives_title")}</h1>

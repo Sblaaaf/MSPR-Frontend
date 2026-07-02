@@ -96,7 +96,7 @@ export default function SubscribePage() {
   const isPaid = currentPlan === "premium" || currentPlan === "premium_plus";
 
   return (
-    <main className="min-h-screen bg-background text-foreground p-5 pb-20">
+    <main id="main-content" className="min-h-screen bg-background text-foreground p-5 pb-20">
       <header className="flex items-center gap-4 mb-8">
         <Link href="/dashboard" className="p-2 hover:bg-accent rounded-full transition-colors">
           <ArrowLeft className="w-5 h-5" />

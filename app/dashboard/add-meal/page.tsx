@@ -451,7 +451,7 @@ export default function AddMealPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-background">
+    <main id="main-content" className="min-h-screen flex flex-col bg-background">
       <header className="flex items-center justify-between px-5 py-4 bg-card/80 backdrop-blur-sm sticky top-0 z-10 border-b border-border">
         <Link href="/dashboard" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="w-4 h-4" />

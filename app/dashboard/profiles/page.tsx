@@ -52,7 +52,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <main className="min-h-screen bg-background animate-fade-in pb-20">
+    <main id="main-content" className="min-h-screen bg-background animate-fade-in pb-20">
       <header className="px-5 py-5 bg-background sticky top-0 z-10">
         <div className="flex items-center justify-between max-w-md mx-auto">
           <div>
