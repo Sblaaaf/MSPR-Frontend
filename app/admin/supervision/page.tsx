@@ -75,7 +75,7 @@ export default function SupervisionPage() {
   const embedUrl = `${GRAFANA_URL}/d/${DASHBOARD_UID}?kiosk&theme=light&refresh=10s`
 
   return (
-    <main className="min-h-screen bg-background flex flex-col">
+    <main id="main-content" className="min-h-screen bg-background flex flex-col">
       <AdminNav current="supervision" />
 
       <section className="flex-1 px-4 py-4" aria-label="Supervision : ETL et Grafana">

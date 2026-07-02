@@ -10,7 +10,7 @@ export default function LoginPage() {
   const { t, lang, setLang } = useTranslation()
 
   return (
-    <main className="min-h-screen flex flex-col bg-background">
+    <main id="main-content" className="min-h-screen flex flex-col bg-background">
       <header className="flex items-center justify-between px-5 py-4 bg-card/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="w-16" />
         <img src="/JARMY-logo.svg" alt="Jarmy" className="h-8" />

@@ -90,7 +90,7 @@ export default function OnboardingPage() {
   const selectedAct = ACTIVITY_LEVELS.find((a) => a.id === activite);
 
   return (
-    <main className="min-h-screen flex flex-col bg-background">
+    <main id="main-content" className="min-h-screen flex flex-col bg-background">
       <div className="h-1 w-full bg-secondary">
         <div className="h-full bg-primary transition-all duration-500 ease-out" style={{ width: `${progress}%` }} />
       </div>

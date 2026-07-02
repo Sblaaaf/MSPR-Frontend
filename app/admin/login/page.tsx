@@ -41,7 +41,7 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-background px-5">
+    <main id="main-content" className="min-h-screen flex flex-col items-center justify-center bg-background px-5">
       <div className="w-full max-w-sm space-y-8">
         <div className="flex flex-col items-center gap-3">
           <div className="p-3 rounded-2xl bg-primary/10">

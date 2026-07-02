@@ -221,7 +221,7 @@ export default function StatsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main id="main-content" className="min-h-screen bg-background text-foreground">
       <header className="px-5 pt-6 pb-4">
         <div className="flex justify-between items-start max-w-md mx-auto">
           <div>

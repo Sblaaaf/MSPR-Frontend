@@ -63,7 +63,7 @@ export default function HealthDashboardPage() {
   const lastMetric = metrics[metrics.length - 1];
 
   return (
-    <main className="min-h-screen flex flex-col bg-background text-foreground">
+    <main id="main-content" className="min-h-screen flex flex-col bg-background text-foreground">
       <header className="flex items-center justify-between px-5 py-5 bg-background sticky top-0 z-10">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t("health_title")}</h1>

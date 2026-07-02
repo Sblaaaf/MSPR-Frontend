@@ -92,14 +92,14 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-background">
+      <main id="main-content" className="min-h-screen flex items-center justify-center bg-background">
         <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </main>
     )
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main id="main-content" className="min-h-screen bg-background">
       <AdminNav
         current="overview"
         actions={
