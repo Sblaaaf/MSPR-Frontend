@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, BarChart2, Target, User, Activity } from "lucide-react";
+import { LayoutDashboard, BarChart2, Target, User, Activity, Users } from "lucide-react";
 import { useTranslation } from "@/lib/i18n-context";
 
 export default function DashboardLayout({
@@ -17,6 +17,7 @@ export default function DashboardLayout({
     { href: "/dashboard", icon: LayoutDashboard, label: t("nav_journal") },
     { href: "/dashboard/stats", icon: BarChart2, label: t("nav_stats") },
     { href: "/dashboard/objectives", icon: Target, label: t("nav_goals") },
+    { href: "/dashboard/social", icon: Users, label: "Social" },
     { href: "/dashboard/health", icon: Activity, label: t("nav_health") },
     { href: "/dashboard/profiles", icon: User, label: t("nav_profile") },
   ];
