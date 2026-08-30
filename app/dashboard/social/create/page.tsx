@@ -56,7 +56,7 @@ export default function CreatePostPage() {
   return (
     <div className="max-w-md mx-auto px-5 pt-6 pb-6 space-y-5">
       <div className="flex items-center gap-3">
-        <button onClick={() => router.back()} className="p-2 rounded-xl hover:bg-accent transition-colors">
+        <button onClick={() => router.back()} aria-label="Retour" className="p-2 rounded-xl hover:bg-accent transition-colors">
           <ArrowLeft className="w-5 h-5 text-foreground" />
         </button>
         <h1 className="text-xl font-bold text-foreground">Nouvelle publication</h1>

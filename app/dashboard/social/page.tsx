@@ -51,6 +51,7 @@ function PostCard({ post, userId, onDelete, onLike }: {
         {post.user_id === userId && (
           <button
             onClick={() => onDelete(post.id)}
+            aria-label="Supprimer la publication"
             className="text-muted-foreground hover:text-destructive transition-colors p-1"
           >
             <Trash2 className="w-4 h-4" />
@@ -141,7 +142,7 @@ export default function SocialFeedPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-foreground">Communauté</h1>
         <Link href="/dashboard/social/create">
-          <Button size="sm" className="rounded-xl gap-1.5">
+          <Button size="sm" className="rounded-xl gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white">
             <Plus className="w-4 h-4" />
             Publier
           </Button>
@@ -171,7 +172,7 @@ export default function SocialFeedPage() {
           <p className="font-semibold text-foreground">Aucune publication</p>
           <p className="text-sm text-muted-foreground">Sois le premier à partager !</p>
           <Link href="/dashboard/social/create">
-            <Button className="rounded-xl mt-2">Créer une publication</Button>
+            <Button className="rounded-xl mt-2 bg-emerald-700 hover:bg-emerald-800 text-white">Créer une publication</Button>
           </Link>
         </div>
       ) : (

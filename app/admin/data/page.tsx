@@ -42,10 +42,10 @@ function Pagination({ page, total, perPage, onChange }: {
     <div className="flex items-center justify-between mt-4 text-sm text-muted-foreground">
       <span>{total} enregistrements — page {page + 1}/{pages}</span>
       <div className="flex gap-2">
-        <Button variant="outline" size="sm" onClick={() => onChange(page - 1)} disabled={page === 0}>
+        <Button variant="outline" size="sm" aria-label="Page précédente" onClick={() => onChange(page - 1)} disabled={page === 0}>
           <ChevronLeft className="w-4 h-4" />
         </Button>
-        <Button variant="outline" size="sm" onClick={() => onChange(page + 1)} disabled={page >= pages - 1}>
+        <Button variant="outline" size="sm" aria-label="Page suivante" onClick={() => onChange(page + 1)} disabled={page >= pages - 1}>
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
@@ -140,12 +140,12 @@ function DataTable({ columns, rows, onDelete, onEdit, loading }: {
                 <td className="py-2">
                   <div className="flex gap-1">
                     {onEdit && (
-                      <Button variant="ghost" size="sm" onClick={() => onEdit(row)}>
+                      <Button variant="ghost" size="sm" aria-label="Modifier" onClick={() => onEdit(row)}>
                         <Pencil className="w-3.5 h-3.5 text-primary" />
                       </Button>
                     )}
                     {onDelete && (
-                      <Button variant="ghost" size="sm"
+                      <Button variant="ghost" size="sm" aria-label="Supprimer"
                         onClick={() => { if (confirm("Supprimer cet enregistrement ?")) onDelete(row.id) }}>
                         <Trash2 className="w-3.5 h-3.5 text-destructive" />
                       </Button>
@@ -351,7 +351,7 @@ function DatasetsList({ refreshKey }: { refreshKey: number }) {
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => handleDelete(d.filename)}
+          <Button variant="ghost" size="sm" aria-label="Supprimer le fichier" onClick={() => handleDelete(d.filename)}
             disabled={deleting === d.filename}>
             {deleting === d.filename
               ? <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -591,7 +591,7 @@ export default function DataPage() {
                           onChange={e => { setSearch(e.target.value); setPage(0) }}
                           className="h-8 pl-8 w-44 text-sm" />
                         {search && (
-                          <button onClick={() => { setSearch(""); setPage(0) }}
+                          <button aria-label="Effacer la recherche" onClick={() => { setSearch(""); setPage(0) }}
                             className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                             <X className="w-3 h-3" />
                           </button>
@@ -606,7 +606,7 @@ export default function DataPage() {
                         {FILTER_OPTIONS[t].map(v => <option key={v} value={v}>{v}</option>)}
                       </select>
                     )}
-                    <Button variant="outline" size="sm"
+                    <Button variant="outline" size="sm" aria-label="Rafraîchir"
                       onClick={() => fetchData(t, page, debouncedSearch, filter)}>
                       <RefreshCw className="w-3.5 h-3.5" />
                     </Button>

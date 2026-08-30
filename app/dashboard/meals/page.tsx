@@ -111,7 +111,7 @@ export default function MealsPage() {
             <Salad className="w-4 h-4 text-primary-foreground" />
           </div>
         </div>
-        <Link href="/dashboard/manual-meal" className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors">
+        <Link href="/dashboard/manual-meal" className="flex items-center gap-1.5 text-sm font-medium text-emerald-700 hover:text-emerald-800 transition-colors">
           <Plus className="w-4 h-4" />
           <span>{t("meals_add")}</span>
         </Link>

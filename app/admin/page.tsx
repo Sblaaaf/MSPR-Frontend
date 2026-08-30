@@ -126,8 +126,11 @@ export default function AdminPage() {
               <p className="text-5xl font-bold text-primary" aria-label={`Score : ${score} sur 100`}>
                 {score}<span className="text-2xl text-muted-foreground">/100</span>
               </p>
-              <Progress value={score} className="h-2" aria-valuenow={score} aria-valuemin={0} aria-valuemax={100} />
-              <Badge variant={score >= 80 ? "default" : score >= 50 ? "secondary" : "destructive"}>
+              <Progress value={score} className="h-2" aria-label="Score qualité des données" aria-valuenow={score} aria-valuemin={0} aria-valuemax={100} />
+              <Badge
+                variant={score >= 80 ? "default" : score >= 50 ? "secondary" : "destructive"}
+                className={score >= 80 ? "bg-emerald-700 text-white" : undefined}
+              >
                 {score >= 80 ? "Bon" : score >= 50 ? "Moyen" : "Faible"}
               </Badge>
               {stats && (
@@ -209,7 +212,7 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <>
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Liste des anomalies, défilement horizontal">
                     <table className="w-full text-sm" role="table" aria-label="Liste des anomalies">
                       <thead>
                         <tr className="border-b text-muted-foreground">
@@ -225,7 +228,7 @@ export default function AdminPage() {
                             <td className="py-2 pr-4"><Badge variant="outline">{a.table_cible}</Badge></td>
                             <td className="py-2 pr-4 font-mono">{a.record_id}</td>
                             <td className="py-2 pr-4 text-muted-foreground truncate max-w-[200px]">{a.detail}</td>
-                            <td className="py-2 text-yellow-600">{a.motif}</td>
+                            <td className="py-2 text-yellow-700">{a.motif}</td>
                           </tr>
                         ))}
                       </tbody>

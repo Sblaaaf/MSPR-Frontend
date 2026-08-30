@@ -98,7 +98,7 @@ export default function SubscribePage() {
   return (
     <main id="main-content" className="min-h-screen bg-background text-foreground p-5 pb-20">
       <header className="flex items-center gap-4 mb-8">
-        <Link href="/dashboard" className="p-2 hover:bg-accent rounded-full transition-colors">
+        <Link href="/dashboard" aria-label={t("back")} className="p-2 hover:bg-accent rounded-full transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <h1 className="text-xl font-bold">{t("subscribe_title")}</h1>

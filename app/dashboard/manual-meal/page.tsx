@@ -280,6 +280,7 @@ export default function ManualMealPage() {
 
             <input
               type="date"
+              aria-label="Date du repas"
               value={dateRepas}
               onChange={(e) => setDateRepas(e.target.value)}
               className="w-full h-12 px-4 bg-card border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
