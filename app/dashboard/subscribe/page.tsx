@@ -177,7 +177,7 @@ export default function SubscribePage() {
             })}
           </div>
 
-          <Button className="w-full h-14 rounded-2xl text-base font-bold" disabled={!selectedPlan} onClick={() => setStep(2)}>
+          <Button className="w-full h-14 rounded-2xl text-base font-bold bg-emerald-700 hover:bg-emerald-800 text-white disabled:bg-emerald-700" disabled={!selectedPlan} onClick={() => setStep(2)}>
             {t("subscribe_continue_payment")}
           </Button>
         </div>
@@ -192,17 +192,17 @@ export default function SubscribePage() {
             </div>
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-xs font-bold uppercase text-muted-foreground">{t("subscribe_card")}</label>
-                <Input placeholder="4242 4242 4242 4242" className="h-12 rounded-xl" />
+                <label htmlFor="card-number" className="text-xs font-bold uppercase text-muted-foreground">{t("subscribe_card")}</label>
+                <Input id="card-number" placeholder="4242 4242 4242 4242" className="h-12 rounded-xl" />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase text-muted-foreground">{t("subscribe_expiry")}</label>
-                  <Input placeholder="MM/YY" className="h-12 rounded-xl" />
+                  <label htmlFor="card-expiry" className="text-xs font-bold uppercase text-muted-foreground">{t("subscribe_expiry")}</label>
+                  <Input id="card-expiry" placeholder="MM/YY" className="h-12 rounded-xl" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase text-muted-foreground">{t("subscribe_cvc")}</label>
-                  <Input placeholder="123" className="h-12 rounded-xl" />
+                  <label htmlFor="card-cvc" className="text-xs font-bold uppercase text-muted-foreground">{t("subscribe_cvc")}</label>
+                  <Input id="card-cvc" placeholder="123" className="h-12 rounded-xl" />
                 </div>
               </div>
             </div>
@@ -212,7 +212,7 @@ export default function SubscribePage() {
             </div>
           </div>
 
-          <Button className="w-full h-14 rounded-2xl text-base font-bold" onClick={handleUpgrade} disabled={loading}>
+          <Button className="w-full h-14 rounded-2xl text-base font-bold bg-emerald-700 hover:bg-emerald-800 text-white" onClick={handleUpgrade} disabled={loading}>
             {loading ? t("subscribe_processing") : `${t("subscribe_pay")} ${plans.find((p) => p.id === selectedPlan)?.price}`}
           </Button>
           <Button variant="ghost" className="w-full" onClick={() => setStep(1)}>

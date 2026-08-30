@@ -206,10 +206,11 @@ export default function OnboardingPage() {
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                  <label htmlFor="onboarding-age" className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                     <Calendar className="w-3 h-3" /> {t("onboarding_age")}
                   </label>
                   <Input
+                    id="onboarding-age"
                     type="number"
                     placeholder="28"
                     value={age}
@@ -220,10 +221,11 @@ export default function OnboardingPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <label htmlFor="onboarding-weight" className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Weight className="w-3 h-3" /> {t("onboarding_weight")}
                     </label>
                     <Input
+                      id="onboarding-weight"
                       type="number"
                       placeholder="72"
                       value={poids}
@@ -233,10 +235,11 @@ export default function OnboardingPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <label htmlFor="onboarding-height" className="text-xs font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Ruler className="w-3 h-3" /> {t("onboarding_height")}
                     </label>
                     <Input
+                      id="onboarding-height"
                       type="number"
                       placeholder="175"
                       value={taille}

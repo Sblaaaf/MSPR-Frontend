@@ -168,7 +168,7 @@ export default function ObjectivesPage() {
                       </div>
                       <button onClick={() => handleToggle(obj)} disabled={toggling === obj.id} className="focus:outline-none">
                         {obj.actif ? (
-                          <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary rounded-full text-[10px] font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors">
+                          <div className="flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-emerald-700 rounded-full text-[10px] font-bold uppercase tracking-wider hover:bg-primary/20 transition-colors">
                             <CheckCircle2 className="w-3 h-3" />
                             {t("objectives_active")}
                           </div>
@@ -216,7 +216,7 @@ export default function ObjectivesPage() {
           <div className="w-full max-w-md bg-card rounded-3xl border border-border shadow-xl flex flex-col max-h-[80vh]">
             <div className="flex items-center justify-between p-5 border-b border-border shrink-0">
               <h2 className="font-bold text-lg">{t("objectives_choose")}</h2>
-              <button onClick={() => setShowModal(false)} className="p-2 rounded-xl hover:bg-accent transition-colors">
+              <button onClick={() => setShowModal(false)} aria-label="Fermer" className="p-2 rounded-xl hover:bg-accent transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>

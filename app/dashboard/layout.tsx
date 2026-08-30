@@ -43,7 +43,7 @@ export default function DashboardLayout({
                   href={item.href}
                   className={`flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-all duration-200 ${
                     isActive
-                      ? "text-primary scale-105"
+                      ? "text-emerald-700 scale-105"
                       : "text-muted-foreground hover:text-foreground"
                   }`}
                 >

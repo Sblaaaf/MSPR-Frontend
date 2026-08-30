@@ -79,15 +79,15 @@ function EditModal({ row, fields, onSave, onClose }: {
       <div className="bg-card rounded-2xl shadow-xl w-full max-w-md mx-4 p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-lg">Modifier #{row.id}</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+          <button onClick={onClose} aria-label="Fermer" className="text-muted-foreground hover:text-foreground">
             <X className="w-5 h-5" />
           </button>
         </div>
         <div className="space-y-3">
           {fields.map(f => (
             <div key={f.key}>
-              <label className="text-xs font-medium text-muted-foreground block mb-1">{f.label}</label>
-              <Input type={f.type ?? "text"} value={values[f.key] ?? ""}
+              <label htmlFor={`edit-${f.key}`} className="text-xs font-medium text-muted-foreground block mb-1">{f.label}</label>
+              <Input id={`edit-${f.key}`} type={f.type ?? "text"} value={values[f.key] ?? ""}
                 onChange={e => setValues((v: any) => ({ ...v, [f.key]: e.target.value }))}
                 className="h-9 text-sm" />
             </div>
@@ -96,7 +96,7 @@ function EditModal({ row, fields, onSave, onClose }: {
         {error && <p className="text-sm text-destructive">{error}</p>}
         <div className="flex gap-2 justify-end">
           <Button variant="outline" size="sm" onClick={onClose}>Annuler</Button>
-          <Button size="sm" onClick={handleSave} disabled={saving}>
+          <Button size="sm" onClick={handleSave} disabled={saving} className="bg-emerald-700 hover:bg-emerald-800 text-white">
             {saving && <RefreshCw className="w-4 h-4 animate-spin mr-1" />}
             Sauvegarder
           </Button>
