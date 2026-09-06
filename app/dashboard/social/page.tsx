@@ -141,12 +141,12 @@ export default function SocialFeedPage() {
     <div className="max-w-md mx-auto px-5 pt-6 pb-6 space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-foreground">Communauté</h1>
-        <Link href="/dashboard/social/create">
-          <Button size="sm" className="rounded-xl gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white">
+        <Button asChild size="sm" className="rounded-xl gap-1.5 bg-emerald-700 hover:bg-emerald-800 text-white">
+          <Link href="/dashboard/social/create">
             <Plus className="w-4 h-4" />
             Publier
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
 
       {loading ? (
@@ -171,9 +171,9 @@ export default function SocialFeedPage() {
           </div>
           <p className="font-semibold text-foreground">Aucune publication</p>
           <p className="text-sm text-muted-foreground">Sois le premier à partager !</p>
-          <Link href="/dashboard/social/create">
-            <Button className="rounded-xl mt-2 bg-emerald-700 hover:bg-emerald-800 text-white">Créer une publication</Button>
-          </Link>
+          <Button asChild className="rounded-xl mt-2 bg-emerald-700 hover:bg-emerald-800 text-white">
+            <Link href="/dashboard/social/create">Créer une publication</Link>
+          </Button>
         </div>
       ) : (
         <>

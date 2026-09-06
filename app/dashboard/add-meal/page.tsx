@@ -481,16 +481,16 @@ export default function AddMealPage() {
                 <li className="flex gap-2 items-center"><Check className="w-4 h-4 text-primary"/> {t("add_meal_paywall_feat2")}</li>
                 <li className="flex gap-2 items-center"><Check className="w-4 h-4 text-primary"/> {t("add_meal_paywall_feat3")}</li>
               </ul>
-              <Link href="/dashboard/subscribe" className="w-full">
-                <Button className="w-full h-14 rounded-2xl text-base font-semibold shadow-lg shadow-primary/20">
+              <Button asChild className="w-full h-14 rounded-2xl text-base font-semibold shadow-lg shadow-primary/20">
+                <Link href="/dashboard/subscribe">
                   {t("add_meal_paywall_cta")}
-                </Button>
-              </Link>
-              <Link href="/dashboard/manual-meal">
-                <Button variant="ghost" className="w-full text-muted-foreground">
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" className="w-full text-muted-foreground">
+                <Link href="/dashboard/manual-meal">
                   {t("add_meal_manual_free")}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           ) : isPremium === true ? (
             <>

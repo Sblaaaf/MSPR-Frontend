@@ -90,11 +90,11 @@ export default function HealthDashboardPage() {
                 <li className="flex gap-3 items-center"><Moon className="w-5 h-5 text-indigo-500"/> {t("health_feat_sleep")}</li>
                 <li className="flex gap-3 items-center"><Scale className="w-5 h-5 text-emerald-500"/> {t("health_feat_weight")}</li>
               </ul>
-              <Link href="/dashboard/subscribe" className="w-full">
-                <Button className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-primary/80">
+              <Button asChild className="w-full h-14 rounded-2xl text-base font-semibold bg-gradient-to-r from-primary to-primary/80">
+                <Link href="/dashboard/subscribe">
                   {t("health_unlock")}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
           ) : (
             <>

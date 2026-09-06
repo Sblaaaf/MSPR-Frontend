@@ -169,7 +169,7 @@ export default function NutritionBalanceCard() {
         {data.items.map((it) => {
           const width = Math.min(it.pct * 100, 100);
           const txtColor =
-            it.status === "ok" ? "text-primary" : it.status === "excess" ? "text-red-500" : "text-amber-500";
+            it.status === "ok" ? "text-emerald-700" : it.status === "excess" ? "text-red-700" : "text-amber-700";
           return (
             <div key={it.nutrient} className="space-y-1">
               <div className="flex justify-between items-baseline text-sm">

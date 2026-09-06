@@ -216,9 +216,9 @@ export default function FitnessPage() {
                 <Target className="w-6 h-6 text-primary" />
               </div>
               <p className="text-sm text-muted-foreground">{t("fitness_no_profile")}</p>
-              <Link href="/dashboard/health">
-                <Button className="rounded-xl">{t("fitness_open_health")}</Button>
-              </Link>
+              <Button asChild className="rounded-xl">
+                <Link href="/dashboard/health">{t("fitness_open_health")}</Link>
+              </Button>
             </div>
           )}
 

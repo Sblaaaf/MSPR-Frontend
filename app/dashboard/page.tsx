@@ -157,11 +157,11 @@ export default function Dashboard() {
               </div>
               <h2 className="text-xl font-black leading-tight">{t("dashboard_unlock_ai")}</h2>
               <p className="text-sm opacity-90 max-w-[200px]">{t("dashboard_unlock_ai_desc")}</p>
-              <Link href="/dashboard/subscribe" className="block pt-2">
-                <Button variant="secondary" className="w-full rounded-2xl font-bold gap-2 text-primary">
+              <Button asChild variant="secondary" className="w-full rounded-2xl font-bold gap-2 text-primary mt-2">
+                <Link href="/dashboard/subscribe">
                   {t("dashboard_go_premium")} <ChevronRight className="w-4 h-4" />
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             </div>
             <Zap className="absolute -bottom-4 -right-4 w-32 h-32 opacity-10 rotate-12" />
           </div>
@@ -180,9 +180,9 @@ export default function Dashboard() {
                 <p className="text-sm font-bold capitalize">{abonnement.replace("_", " ")}</p>
               </div>
             </div>
-            <Link href="/dashboard/subscribe">
-              <Button variant="ghost" size="sm" className="text-xs text-primary font-bold">{t("manage")}</Button>
-            </Link>
+            <Button asChild variant="ghost" size="sm" className="text-xs text-emerald-700 font-bold">
+              <Link href="/dashboard/subscribe">{t("manage")}</Link>
+            </Button>
           </div>
         )}
 
@@ -294,7 +294,7 @@ export default function Dashboard() {
               <History className="w-4 h-4 text-muted-foreground" />
               {t("dashboard_recent_history")}
             </h3>
-            <Link href="/dashboard/meals" className="text-xs font-bold text-primary hover:underline">
+            <Link href="/dashboard/meals" className="text-xs font-bold text-emerald-700 hover:underline">
               {t("dashboard_see_all")}
             </Link>
           </div>
@@ -306,16 +306,16 @@ export default function Dashboard() {
           ) : recentMeals.length === 0 ? (
             <div className="text-center p-8 bg-card border border-dashed border-border rounded-2xl space-y-2">
               <p className="text-muted-foreground text-sm">{t("dashboard_no_meals")}</p>
-              <Link href="/dashboard/manual-meal">
-                <Button variant="outline" size="sm" className="rounded-xl mt-2">{t("dashboard_add_meal")}</Button>
-              </Link>
+              <Button asChild variant="outline" size="sm" className="rounded-xl mt-2">
+                <Link href="/dashboard/manual-meal">{t("dashboard_add_meal")}</Link>
+              </Button>
             </div>
           ) : (
             <div className="space-y-2">
               {recentMeals.map((meal, i) => (
                 <div key={meal.id} className="flex items-center justify-between p-4 bg-card border border-border rounded-2xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 text-xs font-bold shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-700 text-xs font-bold shrink-0">
                       {String(i + 1).padStart(2, "0")}
                     </div>
                     <div className="min-w-0">

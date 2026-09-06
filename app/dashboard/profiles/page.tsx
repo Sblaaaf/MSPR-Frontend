@@ -128,18 +128,18 @@ export default function ProfilePage() {
             </div>
 
             {user.abonnement === "freemium" && (
-              <Link href="/dashboard/subscribe" className="block mt-6 relative z-10">
-                <Button className="w-full h-12 rounded-xl font-bold gap-2 bg-gradient-to-r from-primary to-emerald-400">
+              <Button asChild className="w-full h-12 rounded-xl font-bold gap-2 bg-gradient-to-r from-primary to-emerald-400 mt-6 relative z-10">
+                <Link href="/dashboard/subscribe">
                   <Sparkles className="w-4 h-4" /> {t("profile_go_premium")}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
             {user.abonnement === "premium" && (
-              <Link href="/dashboard/subscribe" className="block mt-6 relative z-10">
-                <Button variant="outline" className="w-full h-12 rounded-xl font-bold gap-2 border-primary text-primary hover:bg-primary/10">
+              <Button asChild variant="outline" className="w-full h-12 rounded-xl font-bold gap-2 border-primary text-primary hover:bg-primary/10 mt-6 relative z-10">
+                <Link href="/dashboard/subscribe">
                   <Watch className="w-4 h-4" /> {t("profile_unlock_plus")}
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
           </div>
         </div>
