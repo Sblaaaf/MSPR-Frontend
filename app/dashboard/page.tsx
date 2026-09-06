@@ -139,9 +139,9 @@ export default function Dashboard() {
             <p className="text-muted-foreground text-sm font-medium">{greeting},</p>
             <h1 className="text-2xl font-bold tracking-tight">{firstName} 👋</h1>
           </div>
-          <Link href="/dashboard/profiles">
+          <Link href="/dashboard/profiles" aria-label={t("nav_profile")}>
             <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors">
-              <img src="/JARMY-logo-02.svg" alt="Jarmy" className="w-5 h-5" />
+              <img src="/JARMY-logo-02.svg" alt="" className="w-5 h-5" />
             </div>
           </Link>
         </div>
@@ -267,29 +267,23 @@ export default function Dashboard() {
 
         {/* Actions Rapides */}
         <div className="grid grid-cols-3 gap-3">
-          <Link href="/dashboard/manual-meal" className="contents">
-            <button className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-3xl gap-2 hover:border-primary/50 transition-all active:scale-95">
+          <Link href="/dashboard/manual-meal" className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-3xl gap-2 hover:border-primary/50 transition-all active:scale-95">
               <div className="w-11 h-11 rounded-2xl bg-secondary flex items-center justify-center text-foreground">
                 <Plus className="w-5 h-5" />
               </div>
               <span className="text-xs font-bold text-center leading-tight">{t("dashboard_manual_entry")}</span>
-            </button>
           </Link>
-          <Link href="/dashboard/add-meal" className="contents">
-            <button className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-3xl gap-2 hover:border-primary/50 transition-all active:scale-95">
+          <Link href="/dashboard/add-meal" className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-3xl gap-2 hover:border-primary/50 transition-all active:scale-95">
               <div className="w-11 h-11 rounded-2xl bg-accent flex items-center justify-center text-primary">
                 <Sparkles className="w-5 h-5" />
               </div>
               <span className="text-xs font-bold text-center leading-tight">{t("dashboard_ai_analysis")}</span>
-            </button>
           </Link>
-          <Link href="/dashboard/fitness" className="contents">
-            <button className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-3xl gap-2 hover:border-primary/50 transition-all active:scale-95">
+          <Link href="/dashboard/fitness" className="flex flex-col items-center justify-center p-4 bg-card border border-border rounded-3xl gap-2 hover:border-primary/50 transition-all active:scale-95">
               <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
                 <Dumbbell className="w-5 h-5" />
               </div>
               <span className="text-xs font-bold text-center leading-tight">{t("fitness_title")}</span>
-            </button>
           </Link>
         </div>
 
